@@ -1,4 +1,8 @@
-specVersion: 0.0.1
+# TODO:
+# Add ERC1155 template, make sure transfers change owner
+# Add PaymentSplitter template, keep track of balances and releases (also burning leads to defraktionalization)
+# Add admin schema, keep track of fee and contract templates
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,67 +12,105 @@ dataSources:
     source:
       address: "0x506a2EB3dB854C55fE5e7eB257e333d3C40585aE"
       abi: FraktalMarket
+      startBlock: 9213695
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.2
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - AdminWithdrawFees
+        # - AdminWithdrawFees
         - Bought
         - Defraktionalized
         - ERC1155Locked
         - ERC1155UnLocked
         - ERC721Locked
         - ERC721UnLocked
-        - FeeUpdated
+        # - FeeUpdated
         - FraktalClaimed
-        - FraktalProtocolUpgraded
+        # - FraktalProtocolUpgraded
         - Fraktionalized
         - ItemListed
         - ItemPriceUpdated
         - Minted
         - OfferMade
-        - OwnershipTransferred
-        - RevenuesProtocolUpgraded
+        # - OwnershipTransferred
+        # - RevenuesProtocolUpgraded
         - SellerPaymentPull
       abis:
         - name: FraktalMarket
           file: ./abis/FraktalMarket.json
       eventHandlers:
-        - event: AdminWithdrawFees(uint256)
-          handler: handleAdminWithdrawFees
-        - event: Bought(address,address,uint256,uint16)
-          handler: handleBought
-        - event: Defraktionalized(address)
-          handler: handleDefraktionalized
-        - event: ERC1155Locked(address,address,address,uint256)
-          handler: handleERC1155Locked
-        - event: ERC1155UnLocked(address,address,address,uint256)
-          handler: handleERC1155UnLocked
-        - event: ERC721Locked(address,address,address,uint256)
-          handler: handleERC721Locked
-        - event: ERC721UnLocked(address,uint256,address,uint256)
-          handler: handleERC721UnLocked
-        - event: FeeUpdated(uint256)
-          handler: handleFeeUpdated
-        - event: FraktalClaimed(address,uint256)
-          handler: handleFraktalClaimed
-        - event: FraktalProtocolUpgraded(address)
-          handler: handleFraktalProtocolUpgraded
-        - event: Fraktionalized(address)
-          handler: handleFraktionalized
         - event: ItemListed(address,uint256,uint256,uint256)
           handler: handleItemListed
         - event: ItemPriceUpdated(address,uint256,uint256)
           handler: handleItemPriceUpdated
         - event: Minted(address,string,address,uint256)
           handler: handleMinted
+        - event: Defraktionalized(address)
+          handler: handleDefraktionalized
+        - event: Fraktionalized(address)
+          handler: handleFraktionalized
         - event: OfferMade(address,address,uint256)
           handler: handleOfferMade
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: RevenuesProtocolUpgraded(address)
-          handler: handleRevenuesProtocolUpgraded
         - event: SellerPaymentPull(address,uint256)
           handler: handleSellerPaymentPull
-      file: ./src/mapping.ts
+        - event: Bought(address,address,uint256,uint16)
+          handler: handleBought
+        - event: ERC1155Locked(address,address,address,uint256)
+          handler: handleERC1155Locked
+        - event: ERC1155UnLocked(address,address,address,uint256)
+          handler: handleERC721UnLocked
+        - event: ERC721Locked(address,address,address,uint256)
+          handler: handleERC721Locked
+        - event: ERC721UnLocked(address,uint256,address,uint256)
+          handler: handleERC721UnLocked
+
+#////////////////
+        # - event: FeeUpdated(uint256)
+        #   handler: handleFeeUpdated
+        # - event: FraktalClaimed(address,uint256)
+        #   handler: handleFraktalClaimed
+        # - event: FraktalProtocolUpgraded(address)
+        #   handler: handleFraktalProtocolUpgraded
+        # - event: OwnershipTransferred(indexed address,indexed address)
+        #   handler: handleOwnershipTransferred
+        # - event: RevenuesProtocolUpgraded(address)
+        #   handler: handleRevenuesProtocolUpgraded
+        # - event: AdminWithdrawFees(uint256)
+        #   handler: handleAdminWithdrawFees
+      file: ./src/market.ts
+templates:
+  - kind: ethereum/contract
+    name: FraktalNFT
+    network: rinkeby
+    source:
+      abi: FraktalNFT
+    mapping:
+      file: ./src/fraktal.ts
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      abis:
+        - name: FraktalNFT
+          file: ./abis/FraktalNFT.json
+      entities:
+        - fraktalNfts
+        - users
+        - listItems
+        - fraktionsBalances
+        - NFTCollaterals
+        - offers
+        - revenues
+      eventHandlers:
+        # event LockedSharesForTransfer(address shareOwner, address to, uint numShares);
+        - event: LockedSharesForTransfer(address,address,uint256)
+          handler: handleLockedSharesForTransfer
+          # event NewRevenueAdded(address payer, address revenueChannel, uint256 amount);
+        - event: NewRevenueAdded(address,address,uint256)
+          handler: handleNewRevenueAdded
+          # event ItemSold(address buyer);
+        - event: ItemSold(address)
+          handler: handleItemSold
+          # address shareOwner, address to, uint numShares
+        - event: unLockedSharesForTransfer(address,address,uint256)
+          handler: handleunLockedSharesForTransfer
