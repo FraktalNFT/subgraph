@@ -11,6 +11,7 @@ type FraktalNft @entity {
   revenues: [Revenue!]!
   offers: [Offer!]!
   status: String!
+  fraktionsIndex: BigInt
   minOffer: BigInt
 }
 
@@ -27,14 +28,19 @@ type Offer @entity {
   offerer: User!
   value: BigInt!
   votes: BigInt!
+  timestamp: BigInt!
+  winner: Boolean!
 }
 
 type Revenue @entity {
   id: ID!
   value: BigInt!
+  timestamp: BigInt!
   creator: User!
-  address: Bytes!
+  tokenAddress: Bytes!
+  buyout: Boolean!
 }
+
 
 type ListItem @entity {
   id: ID!

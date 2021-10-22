@@ -1,5 +1,5 @@
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts';
-import { FraktalNft, User, ListItem, FraktionsBalance, Offer, Revenue } from '../generated/schema';
+import { Address, BigInt } from '@graphprotocol/graph-ts';
+import { User, FraktionsBalance } from '../generated/schema';
 // import { FraktalNFT } from '../types/templates/FraktalNFT/FraktalNFT';
 
 export function getFraktionBalance(ownerString: string, fraktalString: string): FraktionsBalance {
