@@ -100,6 +100,7 @@ export function handleDefraktionalized(event: Defraktionalized):void{
   let fraktalString = event.address.toHexString();
   let fraktal = FraktalNft.load(fraktalString);
   fraktal.fraktionsIndex = null;
+  fraktal.status = 'retrieved';
   fraktal.save();
   let fraktions = getFraktionBalance(event.params.holder.toHexString(), fraktalString)
   fraktions.amount = BigInt.fromI32(0)
@@ -112,13 +113,20 @@ export function handleDefraktionalized(event: Defraktionalized):void{
 // TransferSingle(address operator, address from, address to, uint256 id, uint256 value)
 export function handleTransferSingle(event: TransferSingle): void {
   // check the sub id, if 0, change the owner of fraktals
+  let owner = getUser(event.params.to)
+  let fraktal = FraktalNft.load(event.address.toHexString())
   if(event.params.id == BigInt.fromI32(0)){
-    // get the FraktalNft
-    let owner = getUser(event.params.to)
-    owner.save()
-    let fraktal = FraktalNft.load(event.address.toHexString())
-    // set the owner
     fraktal.owner = owner.id;
     fraktal.save();
   }
+  else{
+    let spender = getUser(event.params.from);
+    let spenderFraktions = getFraktionBalance(spender.id, fraktal.id)
+    let ownerFraktions = getFraktionBalance(owner.id, fraktal.id)
+    spenderFraktions.amount -= event.params.value;
+    ownerFraktions.amount += event.params.value;
+    spenderFraktions.save();
+    ownerFraktions.save();
+  }
+  owner.save()
 }
