@@ -54,7 +54,7 @@ type ListItem @entity {
 type FraktionsBalance @entity {
   id: ID!
   nft: FraktalNft!
-  owner: User!
+  owner: User
   amount: BigInt!
   locked: BigInt!
 }

@@ -19,7 +19,7 @@ import { getUser, getFraktionBalance } from './helpers';
 // event LockedSharesForTransfer(address shareOwner, address to, uint numShares);
 export function handleLockedSharesForTransfer(event: LockedSharesForTransfer): void {
   let idString = event.params.to.toHexString()+'-'+event.address.toHexString();
-  let fraktionBalance = getFraktionBalance(event.transaction.from.toHexString(), event.address.toHexString());
+  let fraktionBalance = getFraktionBalance(event.transaction.from, event.address.toHexString());
   fraktionBalance.locked += event.params.numShares;
   fraktionBalance.save();
 }
@@ -64,21 +64,9 @@ export function handleItemSold(event: ItemSold): void {
 // event unLockedSharesForTransfer(address shareOwner, address to, uint numShares);
 export function handleunLockedSharesForTransfer(event: unLockedSharesForTransfer): void {
   let idString = event.params.to.toHexString()+'-'+event.address.toHexString();
-  let fraktionBalance = getFraktionBalance(event.params.to.toHexString(), event.address.toHexString());
+  let fraktionBalance = getFraktionBalance(event.params.to, event.address.toHexString());
   fraktionBalance.locked = BigInt.fromI32(0);
   fraktionBalance.save();
-  // let contract = FraktalNFT.bind(event.address)
-  // let marketAddress = Address.fromString("0x8272728b245b3db606768Aad22A9d4E0d6e81fF2");
-  // let fraktalStringCall = contract.try_balanceOf(event.params.to, BigInt.fromI32(0))
-  // if (fraktalStringCall.reverted) {
-  //   log.info("reverted on unlocking fraktions", [])
-  // } else {
-  //   if(fraktalStringCall.value === BigInt.fromI32(1)){
-  //     let fraktal = FraktalNft.load(event.address.toHexString())
-  //     // fraktal.owner = marketAddress.toHexString()
-  //     fraktal.save()
-  //   }
-  // }
 }
 // event Fraktionalized(address holder, address minter, uint256 index);
 export function handleFraktionalized(event: Fraktionalized): void {
@@ -86,12 +74,8 @@ export function handleFraktionalized(event: Fraktionalized): void {
   let fraktal = FraktalNft.load(fraktalString);
   fraktal.fraktionsIndex = event.params.index;
   fraktal.save();
-  let fraktions = getFraktionBalance(event.params.minter.toHexString(), fraktalString)
+  let fraktions = getFraktionBalance(event.params.minter, fraktalString)
   fraktions.amount = BigInt.fromI32(10000)
-  fraktions.nft = fraktalString;
-  let owner = getUser(event.params.minter)
-  fraktions.owner = owner.id;
-  fraktions.locked = BigInt.fromI32(0);
   fraktions.save()
 }
 
@@ -102,9 +86,8 @@ export function handleDefraktionalized(event: Defraktionalized):void{
   fraktal.fraktionsIndex = null;
   fraktal.status = 'retrieved';
   fraktal.save();
-  let fraktions = getFraktionBalance(event.params.holder.toHexString(), fraktalString)
+  let fraktions = getFraktionBalance(event.params.holder, fraktalString)
   fraktions.amount = BigInt.fromI32(0)
-  fraktions.locked = BigInt.fromI32(0);
   fraktions.save()
 }
 
@@ -121,8 +104,8 @@ export function handleTransferSingle(event: TransferSingle): void {
   }
   else{
     let spender = getUser(event.params.from);
-    let spenderFraktions = getFraktionBalance(spender.id, fraktal.id)
-    let ownerFraktions = getFraktionBalance(owner.id, fraktal.id)
+    let spenderFraktions = getFraktionBalance(event.params.from, fraktal.id)
+    let ownerFraktions = getFraktionBalance(event.params.to, fraktal.id)
     spenderFraktions.amount -= event.params.value;
     ownerFraktions.amount += event.params.value;
     spenderFraktions.save();
