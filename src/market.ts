@@ -46,10 +46,10 @@ export function handleBought(event: Bought): void {
   let listedItemString = event.params.seller.toHexString()+'-'+fraktalAddress.toHexString()
   let listedItem = ListItem.load(listedItemString)
   let fraktalString = listedItem.fraktal
-  let buyerBalance = getFraktionBalance(buyer.id, fraktalString)
+  let buyerBalance = getFraktionBalance(event.params.buyer, fraktalString)
   let sellerString = event.params.seller.toHexString()
   let seller = getUser(event.params.seller)
-  let sellerBalance = getFraktionBalance(seller.id,fraktalString)
+  let sellerBalance = getFraktionBalance(event.params.seller,fraktalString)
   buyerBalance.amount += event.params.numberOfShares
   sellerBalance.amount -= event.params.numberOfShares
   let sellerBalanceCall = contract.getSellerBalance(event.params.seller)

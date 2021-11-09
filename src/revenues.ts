@@ -37,13 +37,13 @@ export function handlePaymentReleased(event: PaymentReleased): void {
   let revenue = Revenue.load(event.address.toHexString())
   if(revenue.buyout){
     revenue.value -= event.params.amount;
+    let fraktionsBalance = getFraktionBalance(
+      event.transaction.from,
+      revenue.tokenAddress.toHexString()
+    )
+    fraktionsBalance.amount = BigInt.fromI32(0);
+    fraktionsBalance.save()
   }
-  let fraktionsBalance = getFraktionBalance(
-    event.transaction.from.toHexString(),
-    revenue.tokenAddress.toHexString()
-  )
-  fraktionsBalance.amount = BigInt.fromI32(0);
-  fraktionsBalance.save()
   revenue.save()
 }
 
