@@ -1,7 +1,5 @@
 import { BigInt,Address, log } from "@graphprotocol/graph-ts"
 import {
-  FeeUpdated,
-  AdminWithdrawFees,
   FraktalMarket,
   Bought,
   OfferMade,
@@ -40,27 +38,29 @@ export function handleItemListed(event: ItemListed): void {
 // event Bought(address buyer,address seller, address tokenAddress, uint16 numberOfShares);
 export function handleBought(event: Bought): void {
   let contract = FraktalMarket.bind(event.address)
+  let sellerBalanceCall = contract.getSellerBalance(event.params.seller)
   let buyer = getUser(event.params.buyer)
   buyer.save()
+
   let fraktalAddress = event.params.tokenAddress
   let listedItemString = event.params.seller.toHexString()+'-'+fraktalAddress.toHexString()
   let listedItem = ListItem.load(listedItemString)
-  let fraktalString = listedItem.fraktal
-  let buyerBalance = getFraktionBalance(buyer.id, fraktalString)
-  let sellerString = event.params.seller.toHexString()
-  let seller = getUser(event.params.seller)
-  let sellerBalance = getFraktionBalance(seller.id,fraktalString)
-  buyerBalance.amount += event.params.numberOfShares
-  sellerBalance.amount -= event.params.numberOfShares
-  let sellerBalanceCall = contract.getSellerBalance(event.params.seller)
-  seller.balance = sellerBalanceCall
-  seller.save();
-  buyerBalance.save()
-  sellerBalance.save()
   listedItem.amount -= event.params.numberOfShares
   listedItem.gains += event.transaction.value
   listedItem.save()
-  // }
+
+  let fraktalString = listedItem.fraktal
+  let seller = getUser(event.params.seller)
+  seller.balance = sellerBalanceCall
+  seller.save();
+  let buyerFraktions = getFraktionBalance(buyer.id, fraktalString)
+  let sellerFraktions = getFraktionBalance(seller.id,fraktalString)
+// duplicates the buyed items!!
+  buyerFraktions.amount += event.params.numberOfShares
+  sellerFraktions.amount -= event.params.numberOfShares
+  buyerFraktions.save()
+  sellerFraktions.save()
+
 }
 
 // event OfferMade(address offerer, address tokenAddress, uint256 value);
