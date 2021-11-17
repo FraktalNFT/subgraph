@@ -48,6 +48,17 @@ export function handleERC721Locked(event: ERC721Locked): void {
   importedERC721.type = 'ERC721';
   importedERC721.save();
 }
+// event ERC721UnLocked(address owner, uint256 tokenId, address collateralNft, uint256 index);
+// collateral (and index) is 0.. why??
+export function handleERC721UnLocked(event: ERC721UnLocked): void {
+  let importedERC721 = NFTCollateral.load(event.params.collateralNft.toHexString());
+  importedERC721.fraktal = null;
+  importedERC721.tokenId = null;
+  importedERC721.save();
+  let fraktal = FraktalNft.load(importedERC721.fraktal);
+  fraktal.status = 'retrieved'
+  fraktal.save()
+}
 // event ERC1155Locked(address locker, address tokenAddress, address fraktal, uint256 tokenId);
 export function handleERC1155Locked(event: ERC1155Locked): void {
   let user = getUser(event.params.locker);
@@ -60,16 +71,6 @@ export function handleERC1155Locked(event: ERC1155Locked): void {
   importedERC1155.tokenId = event.params.tokenId;
   importedERC1155.type = 'ERC1155';
   importedERC1155.save();
-}
-// event ERC721UnLocked(address owner, uint256 tokenId, address collateralNft, uint256 index);
-export function handleERC721UnLocked(event: ERC721UnLocked): void {
-  let importedERC721 = NFTCollateral.load(event.params.collateralNft.toHexString());
-  let fraktal = FraktalNft.load(importedERC721.fraktal);
-  fraktal.status = 'retrieved'
-  fraktal.save()
-  importedERC721.fraktal = null;
-  importedERC721.tokenId = null;
-  importedERC721.save();
 }
 // event ERC1155UnLocked(address owner, address tokenAddress, address collateralNft, uint256 index);
 export function handleERC1155UnLocked(event: ERC1155UnLocked): void {
