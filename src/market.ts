@@ -53,8 +53,8 @@ export function handleBought(event: Bought): void {
   let seller = getUser(event.params.seller)
   seller.balance = sellerBalanceCall
   seller.save();
-  let buyerFraktions = getFraktionBalance(buyer.id, fraktalString)
-  let sellerFraktions = getFraktionBalance(seller.id,fraktalString)
+  let buyerFraktions = getFraktionBalance(event.params.buyer, fraktalString)
+  let sellerFraktions = getFraktionBalance(event.params.seller,fraktalString)
 // duplicates the buyed items!!
   buyerFraktions.amount += event.params.numberOfShares
   sellerFraktions.amount -= event.params.numberOfShares
