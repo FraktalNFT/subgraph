@@ -52,12 +52,15 @@ export function handleERC721Locked(event: ERC721Locked): void {
 // collateral (and index) is 0.. why??
 export function handleERC721UnLocked(event: ERC721UnLocked): void {
   let importedERC721 = NFTCollateral.load(event.params.collateralNft.toHexString());
+
   importedERC721.fraktal = null;
   importedERC721.tokenId = null;
   importedERC721.save();
   let fraktal = FraktalNft.load(importedERC721.fraktal);
-  fraktal.status = 'retrieved'
-  fraktal.save()
+  if(fraktal){
+    fraktal.status = 'retrieved'
+    fraktal.save()
+  }
 }
 // event ERC1155Locked(address locker, address tokenAddress, address fraktal, uint256 tokenId);
 export function handleERC1155Locked(event: ERC1155Locked): void {
@@ -75,12 +78,14 @@ export function handleERC1155Locked(event: ERC1155Locked): void {
 // event ERC1155UnLocked(address owner, address tokenAddress, address collateralNft, uint256 index);
 export function handleERC1155UnLocked(event: ERC1155UnLocked): void {
   let importedERC1155 = NFTCollateral.load(event.params.collateralNft.toHexString());
-  let fraktal = FraktalNft.load(importedERC1155.fraktal);
-  fraktal.status = 'retrieved'
-  fraktal.save()
   importedERC1155.fraktal = null;
   importedERC1155.tokenId = null;
   importedERC1155.save();
+  let fraktal = FraktalNft.load(importedERC1155.fraktal);
+  if(fraktal){
+    fraktal.status = 'retrieved'
+    fraktal.save()
+  }
 }
 
 // event RevenuesProtocolUpgraded(address _newAddress);
