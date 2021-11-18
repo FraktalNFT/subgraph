@@ -1,21 +1,17 @@
-# TODO:
-# Add ERC1155 template, make sure transfers change owner
-# Add admin schema, keep track of fee and contract templates
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5" #Proxy
-        # "0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851" > "0x2b063393585e5B9A507568D25b42280aE926aD13"
+      address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5"
       abi: FraktalMarket
       startBlock: 9416410
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bought
@@ -29,20 +25,8 @@ dataSources:
         - OfferVoted
       abis:
         - name: FraktalMarket
-          file: ./abis/FraktalMarket.json
-    # event Bought(address buyer,address seller, address tokenAddress, uint256 numberOfShares);
-    # event FeeUpdated(uint16 newFee);
-    # event ItemListed(address owner, address tokenAddress, uint256 price, uint256 amountOfShares);
-    # event ItemPriceUpdated(address owner, address tokenAddress, uint256 newPrice);
-    # event FraktalClaimed(address owner, address tokenAddress);
-    # event SellerPaymentPull(address seller, uint256 balance);
-    # event AdminWithdrawFees(uint256 feesAccrued);
-    # event OfferMade(address offerer, address tokenAddress, uint256 value);
+          file: FraktalMarket\abis\FraktalMarket.json
       eventHandlers:
-        # - event: FeeUpdated(uint16)
-        #   handler: handleFeeUpdated
-        # - event: AdminWithdrawFees(uint256)
-        #   handler: handleAdminWithdrawFees
         - event: Bought(address,address,address,uint256)
           handler: handleBought
         - event: ItemListed(address,address,uint256,uint256)
@@ -55,7 +39,7 @@ dataSources:
           handler: handleOfferMade
         - event: OfferVoted(address,address,address,bool)
           handler: handleOfferVoted
-      file: ./src/market.ts
+      file: FraktalMarket\FraktalMarket.wasm
   - kind: ethereum/contract
     name: FraktalFactory
     network: rinkeby
@@ -65,7 +49,7 @@ dataSources:
       startBlock: 9414170
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Minted
@@ -77,14 +61,7 @@ dataSources:
         - FraktalProtocolUpgraded
       abis:
         - name: FraktalFactory
-          file: ./abis/FraktalFactory.json
-    # event Minted(address creator,string urlIpfs,address tokenAddress,uint256 nftId);
-    # event ERC721Locked(address locker, address tokenAddress, address fraktal, uint256 tokenId);
-    # event ERC721UnLocked(address owner, uint256 tokenId, address collateralNft, uint256 index);
-    # event ERC1155Locked(address locker, address tokenAddress, address fraktal, uint256 tokenId);
-    # event ERC1155UnLocked(address owner, address tokenAddress, address collateralNft, uint256 index);
-    # event RevenuesProtocolUpgraded(address _newAddress);
-    # event FraktalProtocolUpgraded(address _newAddress);
+          file: FraktalFactory\abis\FraktalFactory.json
       eventHandlers:
         - event: Minted(address,string,address,uint256)
           handler: handleMinted
@@ -96,12 +73,7 @@ dataSources:
           handler: handleERC1155Locked
         - event: ERC1155UnLocked(address,address,address,uint256)
           handler: handleERC1155UnLocked
-        # - event: RevenuesProtocolUpgraded(address)
-        #   handler: handleRevenuesProtocolUpgraded
-        # - event: FraktalProtocolUpgraded(address)
-        #   handler: handleFraktalProtocolUpgraded
-      file: ./src/factory.ts
-
+      file: FraktalFactory\FraktalFactory.wasm
 templates:
   - kind: ethereum/contract
     name: FraktalNFT
@@ -109,13 +81,13 @@ templates:
     source:
       abi: FraktalNFT
     mapping:
-      file: ./src/fraktal.ts
+      file: templates\FraktalNFT\FraktalNFT.wasm
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       abis:
         - name: FraktalNFT
-          file: ./abis/FraktalNFT.json
+          file: FraktalNFT\abis\FraktalNFT.json
       entities:
         - LockedSharesForTransfer
         - unLockedSharesForTransfer
@@ -125,14 +97,6 @@ templates:
         - MajorityValueChanged
         - TransferSingle
         - Defraktionalized
-    # event LockedSharesForTransfer(address shareOwner, address to, uint numShares);
-    # event unLockedSharesForTransfer(address shareOwner, address to, uint numShares);
-    # event ItemSold(address buyer, uint256 indexUsed);
-    # event NewRevenueAdded(address payer, address revenueChannel, uint256 amount, bool sold);
-    # event Fraktionalized(address holder, address minter, uint256 index);
-    # event Defraktionalized(address holder, uint256 index);
-
-    # event MajorityValueChanged(uint16 newValue);
       eventHandlers:
         - event: LockedSharesForTransfer(address,address,uint256)
           handler: handleLockedSharesForTransfer
@@ -148,32 +112,24 @@ templates:
           handler: handleDefraktionalized
         - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleTransferSingle
-        # - event: MajorityValueChanged(uint16)
-        #   handler: handleMajorityValueChanged
-
   - kind: ethereum/contract
     name: PaymentSplitterUpgradeable
     network: rinkeby
     source:
       abi: PaymentSplitterUpgradeable
     mapping:
-      file: ./src/revenues.ts
+      file: templates\PaymentSplitterUpgradeable\PaymentSplitterUpgradeable.wasm
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       abis:
         - name: PaymentSplitterUpgradeable
-          file: ./abis/PaymentSplitterUpgradeable.json
+          file: PaymentSplitterUpgradeable\abis\PaymentSplitterUpgradeable.json
       entities:
         - PayeeAdded
         - PaymentReleased
         - PaymentReceived
-    # event PayeeAdded(address account, uint256 shares);
-    # event PaymentReleased(address to, uint256 amount);
-    # event PaymentReceived(address from, uint256 amount);
       eventHandlers:
-        # - event: PayeeAdded(address,uint256)
-        #   handler: handlePayeeAdded
         - event: PaymentReleased(address,uint256)
           handler: handlePaymentReleased
         - event: PaymentReceived(address,uint256)
