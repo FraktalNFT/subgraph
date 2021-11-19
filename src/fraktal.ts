@@ -78,7 +78,9 @@ export function handleDefraktionalized(event: Defraktionalized):void{
   let fraktal = FraktalNft.load(fraktalString);
   fraktal.fraktionsIndex = null;
   fraktal.status = 'retrieved';
-  fraktal.save();
+  // fraktal.fraktions = []; // breaks:  `fraktions` is derived and can not be set wasm backtrace
+  // find other way to delete fraktions
+
   let fraktions = getFraktionBalance(event.params.holder, fraktalString)
   fraktions.amount = BigInt.fromI32(0)
   fraktions.save()
