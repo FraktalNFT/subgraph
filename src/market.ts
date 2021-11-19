@@ -1,4 +1,4 @@
-import { BigInt,Address, log } from "@graphprotocol/graph-ts"
+import { BigInt } from "@graphprotocol/graph-ts"
 import {
   FraktalMarket,
   Bought,
@@ -53,13 +53,13 @@ export function handleBought(event: Bought): void {
   let seller = getUser(event.params.seller)
   seller.balance = sellerBalanceCall
   seller.save();
-  let buyerFraktions = getFraktionBalance(event.params.buyer, fraktalString)
-  let sellerFraktions = getFraktionBalance(event.params.seller,fraktalString)
-// duplicates the buyed items!!
-  buyerFraktions.amount += event.params.numberOfShares
-  sellerFraktions.amount -= event.params.numberOfShares
-  buyerFraktions.save()
-  sellerFraktions.save()
+//   let buyerFraktions = getFraktionBalance(event.params.buyer, fraktalString)
+//   let sellerFraktions = getFraktionBalance(event.params.seller,fraktalString)
+// // duplicates the buyed items!! (transfersingle takes care!)
+//   buyerFraktions.amount += event.params.numberOfShares
+//   sellerFraktions.amount -= event.params.numberOfShares
+//   buyerFraktions.save()
+//   sellerFraktions.save()
 
 }
 
@@ -108,7 +108,6 @@ export function handleFraktalClaimed(event: FraktalClaimed): void {
   }
   fraktal.status = 'Retrieved'
   fraktal.owner = ownerString
-  // overwrite fraktionbalances of everyone to 0? just an idea!
   fraktal.save()
   }
 
@@ -116,7 +115,6 @@ export function handleFraktalClaimed(event: FraktalClaimed): void {
   export function handleOfferVoted(event: OfferVoted): void {
     if(event.params.sold == true){
       let fraktal = FraktalNft.load(event.params.tokenAddress.toHexString());
-      // fraktal.buyer = event.params.offerer.toHexString();
       fraktal.status = 'sold'
       fraktal.save();
       let offerString = event.params.offerer.toHexString()+'-'+event.params.tokenAddress.toHexString();

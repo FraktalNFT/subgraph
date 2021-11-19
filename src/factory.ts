@@ -1,4 +1,3 @@
-import { BigInt,Address, log } from "@graphprotocol/graph-ts"
 import {
   ERC721Locked,
   ERC721UnLocked,
@@ -40,19 +39,15 @@ export function handleERC721Locked(event: ERC721Locked): void {
   let user = getUser(event.params.locker);
   user.save()
   let importedERC721 = new NFTCollateral(event.params.tokenAddress.toHexString());
-  // fraktal.collateral = importedERC721.id;
-  // fraktal.save();
-  let fraktal = FraktalNft.load(event.params.fraktal.toHexString());
-  importedERC721.fraktal = fraktal.id;
+  // let fraktal = FraktalNft.load(event.params.fraktal.toHexString());
+  importedERC721.fraktal = event.params.fraktal.toHexString()// fraktal.id;//or event.params.fraktal.toHexString()?
   importedERC721.tokenId = event.params.tokenId;
   importedERC721.type = 'ERC721';
   importedERC721.save();
 }
 // event ERC721UnLocked(address owner, uint256 tokenId, address collateralNft, uint256 index);
-// collateral (and index) is 0.. why??
 export function handleERC721UnLocked(event: ERC721UnLocked): void {
   let importedERC721 = NFTCollateral.load(event.params.collateralNft.toHexString());
-
   importedERC721.fraktal = null;
   importedERC721.tokenId = null;
   importedERC721.save();
@@ -67,10 +62,8 @@ export function handleERC1155Locked(event: ERC1155Locked): void {
   let user = getUser(event.params.locker);
   user.save()
   let importedERC1155 = new NFTCollateral(event.params.tokenAddress.toHexString());
-  // fraktal.collateral = importedERC1155.id;
-  // fraktal.save();
-  let fraktal = FraktalNft.load(event.params.fraktal.toHexString());
-  importedERC1155.fraktal = fraktal.id;
+  // let fraktal = FraktalNft.load(event.params.fraktal.toHexString());
+  importedERC1155.fraktal = event.params.fraktal.toHexString()// fraktal.id;// same: event.params.fraktal.toHexString()
   importedERC1155.tokenId = event.params.tokenId;
   importedERC1155.type = 'ERC1155';
   importedERC1155.save();
@@ -87,6 +80,5 @@ export function handleERC1155UnLocked(event: ERC1155UnLocked): void {
     fraktal.save()
   }
 }
-
 // event RevenuesProtocolUpgraded(address _newAddress);
 // event FraktalProtocolUpgraded(address _newAddress);

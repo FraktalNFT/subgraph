@@ -1,6 +1,5 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts';
 import { User, FraktionsBalance } from '../generated/schema';
-// import { FraktalNFT } from '../types/templates/FraktalNFT/FraktalNFT';
 
 export function getFraktionBalance(ownerString: Address, fraktalString: string): FraktionsBalance {
   let fraktionBalanceString = ownerString.toHexString()+'-'+fraktalString

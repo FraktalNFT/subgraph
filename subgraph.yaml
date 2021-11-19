@@ -138,8 +138,8 @@ templates:
           handler: handleLockedSharesForTransfer
         - event: unLockedSharesForTransfer(address,address,uint256)
           handler: handleunLockedSharesForTransfer
-        - event: ItemSold(address,uint256)
-          handler: handleItemSold
+        # - event: ItemSold(address,uint256)
+        #   handler: handleItemSold
         - event: NewRevenueAdded(address,address,uint256,bool)
           handler: handleNewRevenueAdded
         - event: Fraktionalized(address,address,uint256)
