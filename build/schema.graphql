@@ -1,0 +1,71 @@
+type FraktalNft @entity {
+  id: ID!
+  marketId: BigInt!
+  hash: String!
+  creator: User!
+  owner: User!
+  createdAt: BigInt!
+  fraktions: [FraktionsBalance!]! @derivedFrom(field: "nft")
+  transactionHash: String!
+  collateral: NFTCollateral @derivedFrom(field: "fraktal")
+  revenues: [Revenue!]!
+  offers: [Offer!]!
+  status: String!
+  fraktionsIndex: BigInt
+  minOffer: BigInt
+}
+
+type NFTCollateral @entity {
+  id: ID!
+  fraktal: FraktalNft
+  tokenId: BigInt
+  type: String!
+}
+
+type Offer @entity {
+  id: ID!
+  fraktal: FraktalNft!
+  offerer: User!
+  value: BigInt!
+  votes: BigInt!
+  timestamp: BigInt!
+  winner: Boolean!
+}
+
+type Revenue @entity {
+  id: ID!
+  value: BigInt!
+  timestamp: BigInt!
+  creator: User!
+  tokenAddress: Bytes!
+  buyout: Boolean!
+}
+
+
+type ListItem @entity {
+  id: ID!
+  seller: User!
+  fraktal: FraktalNft!
+  gains: BigInt!
+  price: BigInt!
+  amount: BigInt!
+}
+
+type FraktionsBalance @entity {
+  id: ID!
+  nft: FraktalNft!
+  owner: User
+  amount: BigInt!
+  locked: BigInt!
+}
+
+type User @entity {
+  id: ID!
+  balance: BigInt!
+  created: [FraktalNft!] @derivedFrom(field: "creator")
+  fraktals: [FraktalNft!]! @derivedFrom(field: "owner")
+  fraktions: [FraktionsBalance!] @derivedFrom(field: "owner")
+  listedItems: [ListItem!]! @derivedFrom(field: "seller")
+  offersMade: [Offer!]! @derivedFrom(field: "offerer")
+  revenues: [Revenue!]! @derivedFrom(field: "creator")
+}

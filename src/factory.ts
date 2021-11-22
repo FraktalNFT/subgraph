@@ -15,9 +15,9 @@ import { getUser } from './helpers';
 // event Minted(address creator,string urlIpfs,address tokenAddress,uint256 nftId);
 export function handleMinted(event: Minted): void {
   let senderString = event.params.creator.toHexString()
-  let user = getUser(event.params.creator);
+  let user = getUser(senderString);
   user.save()
-  let market = getUser(event.address);
+  let market = getUser(event.address.toHexString());
   market.save()
   let fraktalString = event.params.tokenAddress.toHexString()
   let fraktalNft = new FraktalNft(fraktalString)
@@ -36,7 +36,7 @@ export function handleMinted(event: Minted): void {
 
 // event ERC721Locked(address locker, address tokenAddress, address fraktal, uint256 tokenId);
 export function handleERC721Locked(event: ERC721Locked): void {
-  let user = getUser(event.params.locker);
+  let user = getUser(event.params.locker.toHexString());
   user.save()
   let importedERC721 = new NFTCollateral(event.params.tokenAddress.toHexString());
   // let fraktal = FraktalNft.load(event.params.fraktal.toHexString());
@@ -59,7 +59,7 @@ export function handleERC721UnLocked(event: ERC721UnLocked): void {
 }
 // event ERC1155Locked(address locker, address tokenAddress, address fraktal, uint256 tokenId);
 export function handleERC1155Locked(event: ERC1155Locked): void {
-  let user = getUser(event.params.locker);
+  let user = getUser(event.params.locker.toHexString());
   user.save()
   let importedERC1155 = new NFTCollateral(event.params.tokenAddress.toHexString());
   // let fraktal = FraktalNft.load(event.params.fraktal.toHexString());

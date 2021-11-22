@@ -6,14 +6,11 @@ import {
   TransferSingle,
   Fraktionalized,
   Defraktionalized,
-  unLockedSharesForTransfer
-} from "../generated/templates/FraktalNFT/FraktalNFT"
-import {
-  FraktalNft,
-  Revenue,
-} from "../generated/schema"
-import { PaymentSplitterUpgradeable } from '../generated/templates';
-import { getUser, getFraktionBalance } from './helpers';
+  unLockedSharesForTransfer,
+} from "../generated/templates/FraktalNFT/FraktalNFT";
+import { FraktalNft, Revenue } from "../generated/schema";
+import { PaymentSplitterUpgradeable } from "../generated/templates";
+import { getUser, getFraktionBalance } from "./helpers";
 
 // event LockedSharesForTransfer(address shareOwner, address to, uint numShares);
 export function handleLockedSharesForTransfer(event: LockedSharesForTransfer): void {
@@ -37,9 +34,9 @@ export function handleNewRevenueAdded(event: NewRevenueAdded): void {
   }
   revenueChannel.save();
   let fraktal = FraktalNft.load(event.address.toHexString());
-  let revenues = fraktal.revenues
-  revenues.push(revenueString)
-  fraktal.revenues = revenues
+  let revenues = fraktal.revenues;
+  revenues.push(revenueString);
+  fraktal.revenues = revenues;
   fraktal.save();
   PaymentSplitterUpgradeable.create(event.params.revenueChannel);
 }
@@ -67,20 +64,17 @@ export function handleFraktionalized(event: Fraktionalized): void {
   let fraktal = FraktalNft.load(fraktalString);
   fraktal.fraktionsIndex = event.params.index;
   fraktal.save();
-  let fraktions = getFraktionBalance(event.params.minter, fraktalString)
-  fraktions.amount = BigInt.fromI32(10000)
-  fraktions.save()
+  let fraktions = getFraktionBalance(event.params.minter.toHexString(), fraktalString);
+  fraktions.amount = BigInt.fromI32(10000);
+  fraktions.save();
 }
 
 // # event Defraktionalized(address holder, uint256 index);
-export function handleDefraktionalized(event: Defraktionalized):void{
+export function handleDefraktionalized(event: Defraktionalized): void {
   let fraktalString = event.address.toHexString();
   let fraktal = FraktalNft.load(fraktalString);
   fraktal.fraktionsIndex = null;
   fraktal.status = 'retrieved';
-  // fraktal.fraktions = []; // breaks:  `fraktions` is derived and can not be set wasm backtrace
-  // find other way to delete fraktions
-
   let fraktions = getFraktionBalance(event.params.holder, fraktalString)
   fraktions.amount = BigInt.fromI32(0)
   fraktions.save()
@@ -91,9 +85,9 @@ export function handleDefraktionalized(event: Defraktionalized):void{
 // TransferSingle(address operator, address from, address to, uint256 id, uint256 value)
 export function handleTransferSingle(event: TransferSingle): void {
   // check the sub id, if 0, change the owner of fraktals
-  let owner = getUser(event.params.to)
-  let fraktal = FraktalNft.load(event.address.toHexString())
-  if(event.params.id == BigInt.fromI32(0)){
+  let owner = getUser(event.params.to.toHexString());
+  let fraktal = FraktalNft.load(event.address.toHexString());
+  if (event.params.id == BigInt.fromI32(0)) {
     fraktal.owner = owner.id;
     fraktal.save();
   }
