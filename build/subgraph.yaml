@@ -6,7 +6,7 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5"
+      address: "0xD71CB14bB50C39D090083C6c3be934AF2b435fEB"
       abi: FraktalMarket
       startBlock: 9416410
     mapping:
@@ -25,7 +25,7 @@ dataSources:
         - OfferVoted
       abis:
         - name: FraktalMarket
-          file: FraktalMarket\abis\FraktalMarket.json
+          file: FraktalMarket/abis/FraktalMarket.json
       eventHandlers:
         - event: Bought(address,address,address,uint256)
           handler: handleBought
@@ -39,12 +39,12 @@ dataSources:
           handler: handleOfferMade
         - event: OfferVoted(address,address,address,bool)
           handler: handleOfferVoted
-      file: FraktalMarket\FraktalMarket.wasm
+      file: FraktalMarket/FraktalMarket.wasm
   - kind: ethereum/contract
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE"
+      address: "0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e"
       abi: FraktalFactory
       startBlock: 9414170
     mapping:
@@ -61,7 +61,7 @@ dataSources:
         - FraktalProtocolUpgraded
       abis:
         - name: FraktalFactory
-          file: FraktalFactory\abis\FraktalFactory.json
+          file: FraktalFactory/abis/FraktalFactory.json
       eventHandlers:
         - event: Minted(address,string,address,uint256)
           handler: handleMinted
@@ -73,7 +73,7 @@ dataSources:
           handler: handleERC1155Locked
         - event: ERC1155UnLocked(address,address,address,uint256)
           handler: handleERC1155UnLocked
-      file: FraktalFactory\FraktalFactory.wasm
+      file: FraktalFactory/FraktalFactory.wasm
 templates:
   - kind: ethereum/contract
     name: FraktalNFT
@@ -81,13 +81,13 @@ templates:
     source:
       abi: FraktalNFT
     mapping:
-      file: templates\FraktalNFT\FraktalNFT.wasm
+      file: templates/FraktalNFT/FraktalNFT.wasm
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       abis:
         - name: FraktalNFT
-          file: FraktalNFT\abis\FraktalNFT.json
+          file: FraktalNFT/abis/FraktalNFT.json
       entities:
         - LockedSharesForTransfer
         - unLockedSharesForTransfer
@@ -118,13 +118,13 @@ templates:
     source:
       abi: PaymentSplitterUpgradeable
     mapping:
-      file: templates\PaymentSplitterUpgradeable\PaymentSplitterUpgradeable.wasm
+      file: templates/PaymentSplitterUpgradeable/PaymentSplitterUpgradeable.wasm
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       abis:
         - name: PaymentSplitterUpgradeable
-          file: PaymentSplitterUpgradeable\abis\PaymentSplitterUpgradeable.json
+          file: PaymentSplitterUpgradeable/abis/PaymentSplitterUpgradeable.json
       entities:
         - PayeeAdded
         - PaymentReleased
