@@ -7,8 +7,13 @@ import {
   ItemListed,
   SellerPaymentPull,
   OfferVoted,
+  OwnershipTransferred,
+  FeeUpdated,
+  AuctionItemListed,
+  AuctionContribute,
+  AdminWithdrawFees,
 } from "../generated/FraktalMarket/FraktalMarket";
-import { FraktalNft, Offer, ListItem } from "../generated/schema";
+import { FraktalNft, Offer, ListItem, Auction } from "../generated/schema";
 import { getUser, getFraktionBalance } from "./helpers";
 
 // // event ItemListed(address owner, address tokenAddress, uint256 price, uint256 amountOfShares);
@@ -28,11 +33,13 @@ export function handleItemListed(event: ItemListed): void {
   }
   listedItem.price = event.params.price;
   listedItem.amount = event.params.amountOfShares;
+  // listedItem.amount = event.params.amountOfShares.times(BigInt.fromString("1000000000000000000"));
   listedItem.save();
 }
 
 // // event Bought(address buyer,address seller, address tokenAddress, uint16 numberOfShares);
 export function handleBought(event: Bought): void {
+  log.debug('Bought {} {} {} {}',[event.params.buyer.toHexString(), event.params.seller.toHexString(), event.params.tokenAddress.toHexString(), event.params.numberOfShares.toString()]);
   let contract = FraktalMarket.bind(event.address);
   let sellerBalanceCall = contract.getSellerBalance(event.params.seller);
   let buyer = getUser(event.params.buyer.toHexString());
@@ -42,21 +49,24 @@ export function handleBought(event: Bought): void {
   let listedItemString =
     event.params.seller.toHexString() + "-" + fraktalAddress.toHexString();
   let listedItem = ListItem.load(listedItemString)!;
-  listedItem.amount.minus(event.params.numberOfShares);
-  listedItem.gains.plus(event.transaction.value);
+  listedItem.amount = listedItem.amount.minus(event.params.numberOfShares);
+  listedItem.gains = listedItem.gains.plus(event.transaction.value);
   listedItem.save();
 
-  let fraktalString = listedItem.fraktal;
+  // let fraktalString = listedItem.fraktal;
   let seller = getUser(event.params.seller.toHexString());
+  // log.warning('seller before after {} {} {} ',[seller.balance.toString(),sellerBalanceCall.toString(),BigInt.fromI32(1337).toString()])
   seller.balance = sellerBalanceCall;
   seller.save();
-  let buyerFraktions = getFraktionBalance(buyer.id, fraktalString);
-  let sellerFraktions = getFraktionBalance(seller.id, fraktalString);
-  // duplicates the buyed items!!
-  buyerFraktions.amount.plus(event.params.numberOfShares);
-  sellerFraktions.amount.minus(event.params.numberOfShares);
-  buyerFraktions.save();
-  sellerFraktions.save();
+  // let buyerFraktions = getFraktionBalance(buyer.id, fraktalString);
+  // let sellerFraktions = getFraktionBalance(seller.id, fraktalString);
+  // // duplicates the buyed items!!
+  // log.warning('before buyer {} , seller {}',[buyerFraktions.amount.toString(),sellerFraktions.amount.toString()]);
+  // buyerFraktions.amount = buyerFraktions.amount.plus(event.params.numberOfShares);
+  // sellerFraktions.amount = sellerFraktions.amount.minus(event.params.numberOfShares);
+  // log.warning('after buyer {} , seller {}',[buyerFraktions.amount.toString(),sellerFraktions.amount.toString()]);
+  // buyerFraktions.save();
+  // sellerFraktions.save();
 }
 
 // // event OfferMade(address offerer, address tokenAddress, uint256 value);
@@ -125,6 +135,61 @@ export function handleOfferVoted(event: OfferVoted): void {
   }
   // offer.votes = balance...
 }
+
+
+export function handleAdminWithdrawFees(event: AdminWithdrawFees): void {
+}
+
+export function handleAuctionContribute(event: AuctionContribute): void {
+  let participant = event.params.participant.toHexString();
+  // let tokenAddress = event.params.tokenAddress;
+  let seller = event.params.seller.toHexString();
+  let sellerNonce = event.params.sellerNonce.toString();
+  // let participantContribution = event.params.value;
+
+  let entity = Auction.load(`${seller}-${sellerNonce}`);
+  if(entity == null){
+    entity = new Auction(`${seller}-${sellerNonce}`);
+  }
+
+  let _participants = entity.participants;
+  if(_participants)
+  _participants.push(participant);
+
+  if(entity){
+    entity.participants = _participants;
+    entity.save();
+  }
+}
+
+export function handleAuctionItemListed(event: AuctionItemListed): void {
+  let nonceString = event.params.nonce.toString();
+  let sellerString = event.params.owner.toHexString();
+  let id = sellerString+'-'+nonceString;
+  let entity = Auction.load(id);
+
+  if(entity == null){
+    entity = new Auction(id);
+    entity.auctionReserve = BigInt.fromI32(0);
+    entity.participants = [];
+  }
+
+
+  entity.seller = event.params.owner.toHexString();
+  entity.tokenAddress = event.params.tokenAddress.toHexString();
+  entity.reservePrice = event.params.reservePrice;
+  entity.amountOfShare = event.params.amountOfShares;
+  entity.endTime = event.params.endTime;
+  entity.sellerNonce = event.params.nonce;
+
+  entity.save();
+}
+
+
+export function handleFeeUpdated(event: FeeUpdated): void {}
+
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+
 
 // // event FeeUpdated(uint16 newFee);
 // // event AdminWithdrawFees(uint256 feesAccrued);

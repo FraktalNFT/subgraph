@@ -6,9 +6,9 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0xD71CB14bB50C39D090083C6c3be934AF2b435fEB"
+      address: "0xBA25784C326988B1E9A7500A24eB7C641D598EE6"
       abi: FraktalMarket
-      startBlock: 9416410
+      startBlock: 9416409
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -23,6 +23,12 @@ dataSources:
         - AdminWithdrawFees
         - OfferMade
         - OfferVoted
+        - AuctionContribute
+        - AuctionItemListed
+        - FeeUpdated
+        - FraktalClaimed
+        - OwnershipTransferred
+        - SellerPaymentPull
       abis:
         - name: FraktalMarket
           file: FraktalMarket/abis/FraktalMarket.json
@@ -39,14 +45,22 @@ dataSources:
           handler: handleOfferMade
         - event: OfferVoted(address,address,address,bool)
           handler: handleOfferVoted
+        - event: AuctionContribute(address,address,address,uint256,uint256)
+          handler: handleAuctionContribute
+        - event: AuctionItemListed(address,address,uint256,uint256,uint256,uint256)
+          handler: handleAuctionItemListed
+        - event: FeeUpdated(uint16)
+          handler: handleFeeUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
       file: FraktalMarket/FraktalMarket.wasm
   - kind: ethereum/contract
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e"
+      address: "0x32472147b0Fe5D6814AFf5f1D2405A1eDFbCf743"
       abi: FraktalFactory
-      startBlock: 9414170
+      startBlock: 9870101
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

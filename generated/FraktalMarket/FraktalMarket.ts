@@ -28,6 +28,78 @@ export class AdminWithdrawFees__Params {
   }
 }
 
+export class AuctionContribute extends ethereum.Event {
+  get params(): AuctionContribute__Params {
+    return new AuctionContribute__Params(this);
+  }
+}
+
+export class AuctionContribute__Params {
+  _event: AuctionContribute;
+
+  constructor(event: AuctionContribute) {
+    this._event = event;
+  }
+
+  get participant(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get tokenAddress(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get seller(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+
+  get sellerNonce(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
+  }
+
+  get value(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+}
+
+export class AuctionItemListed extends ethereum.Event {
+  get params(): AuctionItemListed__Params {
+    return new AuctionItemListed__Params(this);
+  }
+}
+
+export class AuctionItemListed__Params {
+  _event: AuctionItemListed;
+
+  constructor(event: AuctionItemListed) {
+    this._event = event;
+  }
+
+  get owner(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get tokenAddress(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get reservePrice(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get amountOfShares(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
+  }
+
+  get endTime(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+
+  get nonce(): BigInt {
+    return this._event.parameters[5].value.toBigInt();
+  }
+}
+
 export class Bought extends ethereum.Event {
   get params(): Bought__Params {
     return new Bought__Params(this);
@@ -55,6 +127,20 @@ export class Bought__Params {
 
   get numberOfShares(): BigInt {
     return this._event.parameters[3].value.toBigInt();
+  }
+}
+
+export class Deployed extends ethereum.Event {
+  get params(): Deployed__Params {
+    return new Deployed__Params(this);
+  }
+}
+
+export class Deployed__Params {
+  _event: Deployed;
+
+  constructor(event: Deployed) {
+    this._event = event;
   }
 }
 
@@ -228,6 +314,29 @@ export class SellerPaymentPull__Params {
   }
 }
 
+export class FraktalMarket__auctionListingsResult {
+  value0: Address;
+  value1: BigInt;
+  value2: BigInt;
+  value3: BigInt;
+
+  constructor(value0: Address, value1: BigInt, value2: BigInt, value3: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
+    return map;
+  }
+}
+
 export class FraktalMarket__offersResult {
   value0: BigInt;
   value1: boolean;
@@ -248,6 +357,142 @@ export class FraktalMarket__offersResult {
 export class FraktalMarket extends ethereum.SmartContract {
   static bind(address: Address): FraktalMarket {
     return new FraktalMarket("FraktalMarket", address);
+  }
+
+  auctionListings(
+    param0: Address,
+    param1: Address,
+    param2: BigInt
+  ): FraktalMarket__auctionListingsResult {
+    let result = super.call(
+      "auctionListings",
+      "auctionListings(address,address,uint256):(address,uint256,uint256,uint256)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromAddress(param1),
+        ethereum.Value.fromUnsignedBigInt(param2)
+      ]
+    );
+
+    return new FraktalMarket__auctionListingsResult(
+      result[0].toAddress(),
+      result[1].toBigInt(),
+      result[2].toBigInt(),
+      result[3].toBigInt()
+    );
+  }
+
+  try_auctionListings(
+    param0: Address,
+    param1: Address,
+    param2: BigInt
+  ): ethereum.CallResult<FraktalMarket__auctionListingsResult> {
+    let result = super.tryCall(
+      "auctionListings",
+      "auctionListings(address,address,uint256):(address,uint256,uint256,uint256)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromAddress(param1),
+        ethereum.Value.fromUnsignedBigInt(param2)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new FraktalMarket__auctionListingsResult(
+        value[0].toAddress(),
+        value[1].toBigInt(),
+        value[2].toBigInt(),
+        value[3].toBigInt()
+      )
+    );
+  }
+
+  auctionNonce(param0: Address): BigInt {
+    let result = super.call("auctionNonce", "auctionNonce(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_auctionNonce(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "auctionNonce",
+      "auctionNonce(address):(uint256)",
+      [ethereum.Value.fromAddress(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  auctionReserve(param0: Address, param1: BigInt): BigInt {
+    let result = super.call(
+      "auctionReserve",
+      "auctionReserve(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromUnsignedBigInt(param1)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_auctionReserve(
+    param0: Address,
+    param1: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "auctionReserve",
+      "auctionReserve(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromUnsignedBigInt(param1)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  auctionSellerRedeemed(param0: Address, param1: BigInt): boolean {
+    let result = super.call(
+      "auctionSellerRedeemed",
+      "auctionSellerRedeemed(address,uint256):(bool)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromUnsignedBigInt(param1)
+      ]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_auctionSellerRedeemed(
+    param0: Address,
+    param1: BigInt
+  ): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "auctionSellerRedeemed",
+      "auctionSellerRedeemed(address,uint256):(bool)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromUnsignedBigInt(param1)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   fee(): i32 {
@@ -434,6 +679,45 @@ export class FraktalMarket extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
+  listItemAuction(
+    _tokenAddress: Address,
+    _reservePrice: BigInt,
+    _numberOfShares: BigInt
+  ): BigInt {
+    let result = super.call(
+      "listItemAuction",
+      "listItemAuction(address,uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(_tokenAddress),
+        ethereum.Value.fromUnsignedBigInt(_reservePrice),
+        ethereum.Value.fromUnsignedBigInt(_numberOfShares)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_listItemAuction(
+    _tokenAddress: Address,
+    _reservePrice: BigInt,
+    _numberOfShares: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "listItemAuction",
+      "listItemAuction(address,uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(_tokenAddress),
+        ethereum.Value.fromUnsignedBigInt(_reservePrice),
+        ethereum.Value.fromUnsignedBigInt(_numberOfShares)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   maxPriceRegistered(param0: Address): BigInt {
     let result = super.call(
       "maxPriceRegistered",
@@ -597,6 +881,45 @@ export class FraktalMarket extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  participantContribution(
+    param0: Address,
+    param1: BigInt,
+    param2: Address
+  ): BigInt {
+    let result = super.call(
+      "participantContribution",
+      "participantContribution(address,uint256,address):(uint256)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromUnsignedBigInt(param1),
+        ethereum.Value.fromAddress(param2)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_participantContribution(
+    param0: Address,
+    param1: BigInt,
+    param2: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "participantContribution",
+      "participantContribution(address,uint256,address):(uint256)",
+      [
+        ethereum.Value.fromAddress(param0),
+        ethereum.Value.fromUnsignedBigInt(param1),
+        ethereum.Value.fromAddress(param2)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   sellersBalance(param0: Address): BigInt {
     let result = super.call(
       "sellersBalance",
@@ -667,6 +990,32 @@ export class FraktalMarket extends ethereum.SmartContract {
   }
 }
 
+export class ConstructorCall extends ethereum.Call {
+  get inputs(): ConstructorCall__Inputs {
+    return new ConstructorCall__Inputs(this);
+  }
+
+  get outputs(): ConstructorCall__Outputs {
+    return new ConstructorCall__Outputs(this);
+  }
+}
+
+export class ConstructorCall__Inputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+}
+
+export class ConstructorCall__Outputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+}
+
 export class BuyFraktionsCall extends ethereum.Call {
   get inputs(): BuyFraktionsCall__Inputs {
     return new BuyFraktionsCall__Inputs(this);
@@ -731,6 +1080,36 @@ export class ClaimFraktalCall__Outputs {
   _call: ClaimFraktalCall;
 
   constructor(call: ClaimFraktalCall) {
+    this._call = call;
+  }
+}
+
+export class ExportFraktalCall extends ethereum.Call {
+  get inputs(): ExportFraktalCall__Inputs {
+    return new ExportFraktalCall__Inputs(this);
+  }
+
+  get outputs(): ExportFraktalCall__Outputs {
+    return new ExportFraktalCall__Outputs(this);
+  }
+}
+
+export class ExportFraktalCall__Inputs {
+  _call: ExportFraktalCall;
+
+  constructor(call: ExportFraktalCall) {
+    this._call = call;
+  }
+
+  get tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class ExportFraktalCall__Outputs {
+  _call: ExportFraktalCall;
+
+  constructor(call: ExportFraktalCall) {
     this._call = call;
   }
 }
@@ -834,6 +1213,48 @@ export class ListItemCall__Outputs {
 
   get value0(): boolean {
     return this._call.outputValues[0].value.toBoolean();
+  }
+}
+
+export class ListItemAuctionCall extends ethereum.Call {
+  get inputs(): ListItemAuctionCall__Inputs {
+    return new ListItemAuctionCall__Inputs(this);
+  }
+
+  get outputs(): ListItemAuctionCall__Outputs {
+    return new ListItemAuctionCall__Outputs(this);
+  }
+}
+
+export class ListItemAuctionCall__Inputs {
+  _call: ListItemAuctionCall;
+
+  constructor(call: ListItemAuctionCall) {
+    this._call = call;
+  }
+
+  get _tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _reservePrice(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _numberOfShares(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class ListItemAuctionCall__Outputs {
+  _call: ListItemAuctionCall;
+
+  constructor(call: ListItemAuctionCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
   }
 }
 
@@ -971,6 +1392,120 @@ export class OnERC1155ReceivedCall__Outputs {
   }
 }
 
+export class ParticipateAuctionCall extends ethereum.Call {
+  get inputs(): ParticipateAuctionCall__Inputs {
+    return new ParticipateAuctionCall__Inputs(this);
+  }
+
+  get outputs(): ParticipateAuctionCall__Outputs {
+    return new ParticipateAuctionCall__Outputs(this);
+  }
+}
+
+export class ParticipateAuctionCall__Inputs {
+  _call: ParticipateAuctionCall;
+
+  constructor(call: ParticipateAuctionCall) {
+    this._call = call;
+  }
+
+  get tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get seller(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get sellerNonce(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class ParticipateAuctionCall__Outputs {
+  _call: ParticipateAuctionCall;
+
+  constructor(call: ParticipateAuctionCall) {
+    this._call = call;
+  }
+}
+
+export class RedeemAuctionParticipantCall extends ethereum.Call {
+  get inputs(): RedeemAuctionParticipantCall__Inputs {
+    return new RedeemAuctionParticipantCall__Inputs(this);
+  }
+
+  get outputs(): RedeemAuctionParticipantCall__Outputs {
+    return new RedeemAuctionParticipantCall__Outputs(this);
+  }
+}
+
+export class RedeemAuctionParticipantCall__Inputs {
+  _call: RedeemAuctionParticipantCall;
+
+  constructor(call: RedeemAuctionParticipantCall) {
+    this._call = call;
+  }
+
+  get _tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _seller(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _sellerNonce(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class RedeemAuctionParticipantCall__Outputs {
+  _call: RedeemAuctionParticipantCall;
+
+  constructor(call: RedeemAuctionParticipantCall) {
+    this._call = call;
+  }
+}
+
+export class RedeemAuctionSellerCall extends ethereum.Call {
+  get inputs(): RedeemAuctionSellerCall__Inputs {
+    return new RedeemAuctionSellerCall__Inputs(this);
+  }
+
+  get outputs(): RedeemAuctionSellerCall__Outputs {
+    return new RedeemAuctionSellerCall__Outputs(this);
+  }
+}
+
+export class RedeemAuctionSellerCall__Inputs {
+  _call: RedeemAuctionSellerCall;
+
+  constructor(call: RedeemAuctionSellerCall) {
+    this._call = call;
+  }
+
+  get _tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _seller(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _sellerNonce(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class RedeemAuctionSellerCall__Outputs {
+  _call: RedeemAuctionSellerCall;
+
+  constructor(call: RedeemAuctionSellerCall) {
+    this._call = call;
+  }
+}
+
 export class RenounceOwnershipCall extends ethereum.Call {
   get inputs(): RenounceOwnershipCall__Inputs {
     return new RenounceOwnershipCall__Inputs(this);
@@ -1079,6 +1614,40 @@ export class TransferOwnershipCall__Outputs {
   _call: TransferOwnershipCall;
 
   constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class UnlistAuctionItemCall extends ethereum.Call {
+  get inputs(): UnlistAuctionItemCall__Inputs {
+    return new UnlistAuctionItemCall__Inputs(this);
+  }
+
+  get outputs(): UnlistAuctionItemCall__Outputs {
+    return new UnlistAuctionItemCall__Outputs(this);
+  }
+}
+
+export class UnlistAuctionItemCall__Inputs {
+  _call: UnlistAuctionItemCall;
+
+  constructor(call: UnlistAuctionItemCall) {
+    this._call = call;
+  }
+
+  get tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get sellerNonce(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class UnlistAuctionItemCall__Outputs {
+  _call: UnlistAuctionItemCall;
+
+  constructor(call: UnlistAuctionItemCall) {
     this._call = call;
   }
 }

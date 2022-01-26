@@ -731,3 +731,117 @@ export class User extends Entity {
     this.set("revenues", Value.fromStringArray(value));
   }
 }
+
+export class Auction extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("seller", Value.fromString(""));
+    this.set("tokenAddress", Value.fromString(""));
+    this.set("reservePrice", Value.fromBigInt(BigInt.zero()));
+    this.set("amountOfShare", Value.fromBigInt(BigInt.zero()));
+    this.set("endTime", Value.fromBigInt(BigInt.zero()));
+    this.set("sellerNonce", Value.fromBigInt(BigInt.zero()));
+    this.set("auctionReserve", Value.fromBigInt(BigInt.zero()));
+    this.set("participants", Value.fromStringArray(new Array(0)));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Auction entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Auction entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Auction", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Auction | null {
+    return changetype<Auction | null>(store.get("Auction", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get seller(): string {
+    let value = this.get("seller");
+    return value!.toString();
+  }
+
+  set seller(value: string) {
+    this.set("seller", Value.fromString(value));
+  }
+
+  get tokenAddress(): string {
+    let value = this.get("tokenAddress");
+    return value!.toString();
+  }
+
+  set tokenAddress(value: string) {
+    this.set("tokenAddress", Value.fromString(value));
+  }
+
+  get reservePrice(): BigInt {
+    let value = this.get("reservePrice");
+    return value!.toBigInt();
+  }
+
+  set reservePrice(value: BigInt) {
+    this.set("reservePrice", Value.fromBigInt(value));
+  }
+
+  get amountOfShare(): BigInt {
+    let value = this.get("amountOfShare");
+    return value!.toBigInt();
+  }
+
+  set amountOfShare(value: BigInt) {
+    this.set("amountOfShare", Value.fromBigInt(value));
+  }
+
+  get endTime(): BigInt {
+    let value = this.get("endTime");
+    return value!.toBigInt();
+  }
+
+  set endTime(value: BigInt) {
+    this.set("endTime", Value.fromBigInt(value));
+  }
+
+  get sellerNonce(): BigInt {
+    let value = this.get("sellerNonce");
+    return value!.toBigInt();
+  }
+
+  set sellerNonce(value: BigInt) {
+    this.set("sellerNonce", Value.fromBigInt(value));
+  }
+
+  get auctionReserve(): BigInt {
+    let value = this.get("auctionReserve");
+    return value!.toBigInt();
+  }
+
+  set auctionReserve(value: BigInt) {
+    this.set("auctionReserve", Value.fromBigInt(value));
+  }
+
+  get participants(): Array<string> {
+    let value = this.get("participants");
+    return value!.toStringArray();
+  }
+
+  set participants(value: Array<string>) {
+    this.set("participants", Value.fromStringArray(value));
+  }
+}
