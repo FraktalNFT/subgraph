@@ -93,44 +93,7 @@ export function handleAdminWithdrawFees(event: AdminWithdrawFees): void {
   // - contract.zeroAddress(...)
 }
 
-
-export function handleBought(event: Bought): void {
-  // event Bought(address buyer,address seller, uint tokenId, uint numberOfShares);
-    let fraktalId = event.params.tokenId + BigInt.fromI32(1)
-    let fraktalString = fraktalId.toHexString()
-    let buyerString = event.params.buyer.toHexString()
-    let user = User.load(buyerString)
-    if (user == null) {
-      user = new User(buyerString)
-      user.balance = BigInt.fromI32(0)
-      user.save()
-    }
-    let sellerString = event.params.seller.toHexString()
-    let buyerBalance = FraktionsBalance.load(buyerString+'-'+fraktalString)
-    if (buyerBalance == null) {
-      buyerBalance = new FraktionsBalance(buyerString+'-'+fraktalString)
-      buyerBalance.amount = BigInt.fromI32(0)
-      buyerBalance.nft = fraktalString
-      buyerBalance.owner = buyerString
-    }
-    let sellerBalance = FraktionsBalance.load(sellerString+'-'+fraktalString)
-    buyerBalance.amount += event.params.numberOfShares
-    sellerBalance.amount -= event.params.numberOfShares
-    let sellerUser = User.load(sellerString)
-    let listedItemId = sellerString+'-'+fraktalString
-    let listedItem = ListItem.load(listedItemId)
-    let value = event.params.numberOfShares * listedItem.price
-    sellerUser.balance += value
-    listedItem.balance += value
-    listedItem.amount -= event.params.numberOfShares
-
-    buyerBalance.save()
-    sellerBalance.save()
-    sellerUser.save()
-    listedItem.save()
-}
-
-// export function handleBought(event: Bought): void {}
+export function handleBought(event: Bought): void {}
 
 export function handleDefraktionalized(event: Defraktionalized): void {}
 
@@ -152,65 +115,11 @@ export function handleFraktalProtocolUpgraded(
 
 export function handleFraktionalized(event: Fraktionalized): void {}
 
-export function handleItemListed(event: ItemListed): void {
-  // event ItemListed(address owner,uint256 tokenId, uint256 price, uint256 amountOfShares, string typeList);
-    let fraktalId = event.params.tokenId + BigInt.fromI32(1)
-    let fraktalString = fraktalId.toHexString()
-    let senderString = event.params.owner.toHexString()
-    let listedItemId = senderString+'-'+fraktalString
+export function handleItemListed(event: ItemListed): void {}
 
-    let listedItem = new ListItem(listedItemId)
-    listedItem.fraktal = fraktalString
-    listedItem.seller = senderString
-    listedItem.balance = BigInt.fromI32(0)
-    listedItem.price = event.params.price
-    listedItem.amount = event.params.amountOfShares
-    listedItem.type = event.params.typeList
-    listedItem.save()
-}
-// export function handleItemListed(event: ItemListed): void {}
+export function handleItemPriceUpdated(event: ItemPriceUpdated): void {}
 
-
-export function handleItemPriceUpdated(event: ItemPriceUpdated): void {
-  // event ItemPriceUpdated(address owner, uint256 tokenId, uint256 newPrice);
-    let fraktalId = event.params.tokenId + BigInt.fromI32(1)
-    let fraktalString = fraktalId.toHexString()
-    let ownerString = event.params.owner.toHexString()
-
-    let listedItemId = ownerString+'-'+fraktalString
-    let listedItem = ListItem.load(listedItemId)
-    if(listedItem){
-      listedItem.price = event.params.newPrice
-      listedItem.save()
-    }
-}
-// export function handleItemPriceUpdated(event: ItemPriceUpdated): void {}
-
-export function handleMinted(event: Minted): void {
-  let senderString = event.params.creator.toHexString()
-  let user = User.load(senderString)
-  if (user == null) {
-    user = new User(senderString)
-    user.balance = BigInt.fromI32(0)
-  }
-  let fraktalString = event.params.nftId.toHexString()
-  let fraktalNft = new FraktalNFT(fraktalString)
-  fraktalNft.marketId = event.params.nftId - BigInt.fromI32(1)
-  fraktalNft.creator = senderString
-  fraktalNft.owner = senderString
-  fraktalNft.hash = event.params.urlIpfs
-  let fraktionsString = senderString+'-'+fraktalString
-  let fraktions = new FraktionsBalance(fraktionsString)
-  fraktions.amount = BigInt.fromI32(10000)
-  fraktions.owner = senderString
-  fraktions.nft = fraktalString
-  fraktalNft.createdAt = event.block.timestamp
-  fraktalNft.transactionHash = event.transaction.hash.toHex()
-  fraktions.save()
-  fraktalNft.save()
-  user.save()
-}
-// export function handleMinted(event: Minted): void {}
+export function handleMinted(event: Minted): void {}
 
 export function handleOfferMade(event: OfferMade): void {}
 

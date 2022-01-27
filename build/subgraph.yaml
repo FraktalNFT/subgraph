@@ -6,7 +6,7 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0xBA25784C326988B1E9A7500A24eB7C641D598EE6"
+      address: "0x47b724E8F39d41b9c79ee3632b2eCABB4C6DcFA8"
       abi: FraktalMarket
       startBlock: 9416409
     mapping:
@@ -58,7 +58,7 @@ dataSources:
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0x32472147b0Fe5D6814AFf5f1D2405A1eDFbCf743"
+      address: "0xd27309061D960342285B942055FBa6556A287543"
       abi: FraktalFactory
       startBlock: 9870101
     mapping:
