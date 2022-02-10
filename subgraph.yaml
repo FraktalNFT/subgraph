@@ -9,13 +9,16 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5" #Proxy
+      address: "0x1421ba6B13955102F0EB92fcB819e97bc1D00578"  
+      # address: "0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4"  w/ auction 
+      #0xD71CB14bB50C39D090083C6c3be934AF2b435fEB current 
+      # address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5" #Proxy
         # "0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851" > "0x2b063393585e5B9A507568D25b42280aE926aD13"
       abi: FraktalMarket
-      startBlock: 9416410
+      startBlock: 10138586
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bought
@@ -27,6 +30,12 @@ dataSources:
         - AdminWithdrawFees
         - OfferMade
         - OfferVoted
+        - AuctionContribute
+        - AuctionItemListed
+        - FeeUpdated
+        - FraktalClaimed
+        - OwnershipTransferred
+        - SellerPaymentPull
       abis:
         - name: FraktalMarket
           file: ./abis/FraktalMarket.json
@@ -55,17 +64,30 @@ dataSources:
           handler: handleOfferMade
         - event: OfferVoted(address,address,address,bool)
           handler: handleOfferVoted
+        - event: AuctionContribute(address,address,address,uint256,uint256)
+          handler: handleAuctionContribute
+        - event: AuctionItemListed(address,address,uint256,uint256,uint256,uint256)
+          handler: handleAuctionItemListed
+        - event: FeeUpdated(uint16)
+          handler: handleFeeUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
       file: ./src/market.ts
   - kind: ethereum/contract
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE"
+      address: "0xec6cA84e13E013A3F8C2D62A9030a01234CB9bF3"
+      # address: "0xd8646eA0064538EC100881893d98537f611C53bC" new with decimals
+      # address: "0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e" oldv2
+      # address: "0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE" old
+      # refer https://github.com/FraktalNFT/dapp-frontend/blob/main/utils/constants.ts
       abi: FraktalFactory
-      startBlock: 9414170
+      startBlock: 10138586 
+      # startBlock: 9414170
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Minted
@@ -111,7 +133,7 @@ templates:
     mapping:
       file: ./src/fraktal.ts
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       abis:
         - name: FraktalNFT
@@ -159,7 +181,7 @@ templates:
     mapping:
       file: ./src/revenues.ts
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       abis:
         - name: PaymentSplitterUpgradeable

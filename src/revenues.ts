@@ -34,7 +34,7 @@ export function handlePaymentReleased(event: PaymentReleased): void {
   // let contract = PaymentSplitterUpgradeable.bind(event.address)
   // let buyout = contract.try_buyout()
   // revenueChannel.buyout = buyout;
-  let revenue = Revenue.load(event.address.toHexString())
+  let revenue = Revenue.load(event.address.toHexString())!
   if(revenue.buyout){
     revenue.value.minus(event.params.amount);
     let fraktionsBalance = getFraktionBalance(
@@ -51,6 +51,6 @@ export function handlePaymentReleased(event: PaymentReleased): void {
 export function handlePaymentReceived(event: PaymentReceived): void {
   // from
   // amount
-  let revenue = Revenue.load(event.address.toHexString())
+  let revenue = Revenue.load(event.address.toHexString())!
   revenue.value.plus(event.params.amount);
 }
