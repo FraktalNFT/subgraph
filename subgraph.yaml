@@ -9,13 +9,13 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0x47b724E8F39d41b9c79ee3632b2eCABB4C6DcFA8"  
+      address: "0x1421ba6B13955102F0EB92fcB819e97bc1D00578"  
       # address: "0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4"  w/ auction 
       #0xD71CB14bB50C39D090083C6c3be934AF2b435fEB current 
       # address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5" #Proxy
         # "0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851" > "0x2b063393585e5B9A507568D25b42280aE926aD13"
       abi: FraktalMarket
-      startBlock: 9416409
+      startBlock: 10138586
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -77,13 +77,13 @@ dataSources:
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0xd27309061D960342285B942055FBa6556A287543"
+      address: "0xec6cA84e13E013A3F8C2D62A9030a01234CB9bF3"
       # address: "0xd8646eA0064538EC100881893d98537f611C53bC" new with decimals
       # address: "0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e" oldv2
       # address: "0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE" old
       # refer https://github.com/FraktalNFT/dapp-frontend/blob/main/utils/constants.ts
       abi: FraktalFactory
-      startBlock: 9870101
+      startBlock: 10138586 
       # startBlock: 9414170
     mapping:
       kind: ethereum/events
