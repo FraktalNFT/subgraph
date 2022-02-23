@@ -41,16 +41,6 @@ type Revenue @entity {
   buyout: Boolean!
 }
 
-
-type ListItem @entity {
-  id: ID!
-  seller: User!
-  fraktal: FraktalNft!
-  gains: BigInt!
-  price: BigInt!
-  amount: BigInt!
-}
-
 type FraktionsBalance @entity {
   id: ID!
   nft: FraktalNft!
@@ -70,13 +60,22 @@ type User @entity {
   revenues: [Revenue!]! @derivedFrom(field: "creator")
 }
 
+type ListItem @entity {
+  id: ID!
+  seller: User!
+  fraktal: FraktalNft!
+  price: BigInt!
+  shares: BigInt!
+  gains: BigInt!
+}
+
 type Auction @entity {
   id: ID!
   seller: String!
-  tokenAddress: String!
-  reservePrice: BigInt!
-  amountOfShare: BigInt!
-  endTime: BigInt!
+  fraktal: String!
+  price: BigInt!
+  shares: BigInt!
+  end: BigInt!
   sellerNonce: BigInt!
   auctionReserve: BigInt!
   participants: [String!]!

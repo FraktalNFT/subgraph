@@ -451,90 +451,6 @@ export class Revenue extends Entity {
   }
 }
 
-export class ListItem extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-
-    this.set("seller", Value.fromString(""));
-    this.set("fraktal", Value.fromString(""));
-    this.set("gains", Value.fromBigInt(BigInt.zero()));
-    this.set("price", Value.fromBigInt(BigInt.zero()));
-    this.set("amount", Value.fromBigInt(BigInt.zero()));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save ListItem entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.STRING,
-        "Cannot save ListItem entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
-      );
-      store.set("ListItem", id.toString(), this);
-    }
-  }
-
-  static load(id: string): ListItem | null {
-    return changetype<ListItem | null>(store.get("ListItem", id));
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value!.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get seller(): string {
-    let value = this.get("seller");
-    return value!.toString();
-  }
-
-  set seller(value: string) {
-    this.set("seller", Value.fromString(value));
-  }
-
-  get fraktal(): string {
-    let value = this.get("fraktal");
-    return value!.toString();
-  }
-
-  set fraktal(value: string) {
-    this.set("fraktal", Value.fromString(value));
-  }
-
-  get gains(): BigInt {
-    let value = this.get("gains");
-    return value!.toBigInt();
-  }
-
-  set gains(value: BigInt) {
-    this.set("gains", Value.fromBigInt(value));
-  }
-
-  get price(): BigInt {
-    let value = this.get("price");
-    return value!.toBigInt();
-  }
-
-  set price(value: BigInt) {
-    this.set("price", Value.fromBigInt(value));
-  }
-
-  get amount(): BigInt {
-    let value = this.get("amount");
-    return value!.toBigInt();
-  }
-
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
-  }
-}
-
 export class FraktionsBalance extends Entity {
   constructor(id: string) {
     super();
@@ -732,16 +648,100 @@ export class User extends Entity {
   }
 }
 
+export class ListItem extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("seller", Value.fromString(""));
+    this.set("fraktal", Value.fromString(""));
+    this.set("price", Value.fromBigInt(BigInt.zero()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
+    this.set("gains", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save ListItem entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save ListItem entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("ListItem", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ListItem | null {
+    return changetype<ListItem | null>(store.get("ListItem", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get seller(): string {
+    let value = this.get("seller");
+    return value!.toString();
+  }
+
+  set seller(value: string) {
+    this.set("seller", Value.fromString(value));
+  }
+
+  get fraktal(): string {
+    let value = this.get("fraktal");
+    return value!.toString();
+  }
+
+  set fraktal(value: string) {
+    this.set("fraktal", Value.fromString(value));
+  }
+
+  get price(): BigInt {
+    let value = this.get("price");
+    return value!.toBigInt();
+  }
+
+  set price(value: BigInt) {
+    this.set("price", Value.fromBigInt(value));
+  }
+
+  get shares(): BigInt {
+    let value = this.get("shares");
+    return value!.toBigInt();
+  }
+
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
+  }
+
+  get gains(): BigInt {
+    let value = this.get("gains");
+    return value!.toBigInt();
+  }
+
+  set gains(value: BigInt) {
+    this.set("gains", Value.fromBigInt(value));
+  }
+}
+
 export class Auction extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("seller", Value.fromString(""));
-    this.set("tokenAddress", Value.fromString(""));
-    this.set("reservePrice", Value.fromBigInt(BigInt.zero()));
-    this.set("amountOfShare", Value.fromBigInt(BigInt.zero()));
-    this.set("endTime", Value.fromBigInt(BigInt.zero()));
+    this.set("fraktal", Value.fromString(""));
+    this.set("price", Value.fromBigInt(BigInt.zero()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
+    this.set("end", Value.fromBigInt(BigInt.zero()));
     this.set("sellerNonce", Value.fromBigInt(BigInt.zero()));
     this.set("auctionReserve", Value.fromBigInt(BigInt.zero()));
     this.set("participants", Value.fromStringArray(new Array(0)));
@@ -782,40 +782,40 @@ export class Auction extends Entity {
     this.set("seller", Value.fromString(value));
   }
 
-  get tokenAddress(): string {
-    let value = this.get("tokenAddress");
+  get fraktal(): string {
+    let value = this.get("fraktal");
     return value!.toString();
   }
 
-  set tokenAddress(value: string) {
-    this.set("tokenAddress", Value.fromString(value));
+  set fraktal(value: string) {
+    this.set("fraktal", Value.fromString(value));
   }
 
-  get reservePrice(): BigInt {
-    let value = this.get("reservePrice");
+  get price(): BigInt {
+    let value = this.get("price");
     return value!.toBigInt();
   }
 
-  set reservePrice(value: BigInt) {
-    this.set("reservePrice", Value.fromBigInt(value));
+  set price(value: BigInt) {
+    this.set("price", Value.fromBigInt(value));
   }
 
-  get amountOfShare(): BigInt {
-    let value = this.get("amountOfShare");
+  get shares(): BigInt {
+    let value = this.get("shares");
     return value!.toBigInt();
   }
 
-  set amountOfShare(value: BigInt) {
-    this.set("amountOfShare", Value.fromBigInt(value));
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
   }
 
-  get endTime(): BigInt {
-    let value = this.get("endTime");
+  get end(): BigInt {
+    let value = this.get("end");
     return value!.toBigInt();
   }
 
-  set endTime(value: BigInt) {
-    this.set("endTime", Value.fromBigInt(value));
+  set end(value: BigInt) {
+    this.set("end", Value.fromBigInt(value));
   }
 
   get sellerNonce(): BigInt {

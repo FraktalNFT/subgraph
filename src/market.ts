@@ -32,7 +32,7 @@ export function handleItemListed(event: ItemListed): void {
     listedItem.gains = BigInt.fromI32(0);
   }
   listedItem.price = event.params.price;
-  listedItem.amount = event.params.amountOfShares;
+  listedItem.shares = event.params.amountOfShares;
   // listedItem.amount = event.params.amountOfShares.times(BigInt.fromString("1000000000000000000"));
   listedItem.save();
 }
@@ -49,7 +49,7 @@ export function handleBought(event: Bought): void {
   let listedItemString =
     event.params.seller.toHexString() + "-" + fraktalAddress.toHexString();
   let listedItem = ListItem.load(listedItemString)!;
-  listedItem.amount = listedItem.amount.minus(event.params.numberOfShares);
+  listedItem.shares = listedItem.shares.minus(event.params.numberOfShares);
   listedItem.gains = listedItem.gains.plus(event.transaction.value);
   listedItem.save();
 
@@ -174,12 +174,11 @@ export function handleAuctionItemListed(event: AuctionItemListed): void {
     entity.participants = [];
   }
 
-
   entity.seller = event.params.owner.toHexString();
-  entity.tokenAddress = event.params.tokenAddress.toHexString();
-  entity.reservePrice = event.params.reservePrice;
-  entity.amountOfShare = event.params.amountOfShares;
-  entity.endTime = event.params.endTime;
+  entity.fraktal = event.params.tokenAddress.toHexString();
+  entity.price = event.params.reservePrice;
+  entity.shares = event.params.amountOfShares;
+  entity.end = event.params.endTime;
   entity.sellerNonce = event.params.nonce;
 
   entity.save();
