@@ -1,4 +1,4 @@
-import { BigInt, Address, log } from "@graphprotocol/graph-ts";
+import { BigInt, Address, store } from "@graphprotocol/graph-ts";
 import {
   FraktalMarket,
   Bought,
@@ -15,26 +15,37 @@ import {
 } from "../generated/FraktalMarket/FraktalMarket";
 import { FraktalNft, Offer, ListItem, Auction } from "../generated/schema";
 import { getUser, getFraktionBalance } from "./helpers";
+import { log } from "matchstick-as/assembly/log"
 
 // // event ItemListed(address owner, address tokenAddress, uint256 price, uint256 amountOfShares);
 export function handleItemListed(event: ItemListed): void {
-  let fraktalAddress = event.params.tokenAddress;
-  let fraktal = FraktalNft.load(fraktalAddress.toHexString())!;
-  fraktal.status = "open";
-  fraktal.save();
-  let senderString = event.params.owner.toHexString();
-  let listedItemId = senderString + "-" + fraktalAddress.toHexString();
-  let listedItem = ListItem.load(listedItemId);
-  if (!listedItem) {
-    listedItem = new ListItem(listedItemId);
-    listedItem.fraktal = fraktalAddress.toHexString();
-    listedItem.seller = senderString;
-    listedItem.gains = BigInt.fromI32(0);
+  let token = event.params.tokenAddress.toHexString()
+  let owner = event.params.owner.toHexString()
+  let price = event.params.price
+  let shares = event.params.amountOfShares
+  let id = [owner, token].join("-")
+
+  // Delisting item when price and shares are both zero
+  const delisting = price.isZero() && shares.isZero() && ListItem.load(id) !== null
+
+  if(delisting) {
+    store.remove("ListItem", id)
+  } else {
+    const item = new ListItem(id)
+    item.seller = owner
+    item.fraktal = token
+    item.gains = BigInt.fromI32(0)
+    item.price = price
+    item.shares = shares
+    item.save()
   }
-  listedItem.price = event.params.price;
-  listedItem.shares = event.params.amountOfShares;
-  // listedItem.amount = event.params.amountOfShares.times(BigInt.fromString("1000000000000000000"));
-  listedItem.save();
+
+  const nft = FraktalNft.load(token)
+
+  if (nft) {
+    nft.status = delisting ? "closed" : "open"
+    nft.save()
+  }
 }
 
 // // event Bought(address buyer,address seller, address tokenAddress, uint16 numberOfShares);
@@ -165,7 +176,7 @@ export function handleAuctionContribute(event: AuctionContribute): void {
 export function handleAuctionItemListed(event: AuctionItemListed): void {
   let nonceString = event.params.nonce.toString();
   let sellerString = event.params.owner.toHexString();
-  let id = sellerString+'-'+nonceString;
+  let id = [sellerString, nonceString].join("-")
   let entity = Auction.load(id);
 
   if(entity == null){
