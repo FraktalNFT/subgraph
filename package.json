@@ -1,5 +1,6 @@
 {
   "name": "fraktal2rinkeby",
+  "version": "0.0.3",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
@@ -12,7 +13,6 @@
     "coverage": "graph test -- -c",
     "predocker-test": "docker build -t matchstick .",
     "docker-test": "docker run --rm matchstick"
-
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.25.3",
