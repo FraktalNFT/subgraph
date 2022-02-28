@@ -71,8 +71,8 @@ type ListItem @entity {
 
 type Auction @entity {
   id: ID!
-  seller: String!
-  fraktal: String!
+  seller: User!
+  fraktal: FraktalNft!
   price: BigInt!
   shares: BigInt!
   end: BigInt!
