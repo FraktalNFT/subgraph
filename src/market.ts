@@ -14,58 +14,68 @@ import {
   AdminWithdrawFees,
 } from "../generated/FraktalMarket/FraktalMarket";
 import { FraktalNft, Offer, ListItem, Auction } from "../generated/schema";
-import { getUser, getFraktionBalance } from "./helpers";
+import { getUser, getFraktionBalance, getFraktal } from "./helpers";
 import { log } from "matchstick-as/assembly/log"
 
 // // event ItemListed(address owner, address tokenAddress, uint256 price, uint256 amountOfShares);
 export function handleItemListed(event: ItemListed): void {
-  let token = event.params.tokenAddress.toHexString()
-  let owner = event.params.owner.toHexString()
+  let fraktalId = event.params.tokenAddress.toHexString()
+  let fraktal = getFraktal(fraktalId)
+  let owner = getUser(event.params.owner.toHexString())
   let price = event.params.price
   let shares = event.params.amountOfShares
-  let id = [owner, token].join("-")
-
+  let id = owner.id + "-" + fraktal.id
+  let item = ListItem.load(id)
   // Delisting item when price and shares are both zero
-  const delisting = price.isZero() && shares.isZero() && ListItem.load(id) !== null
+  // let delisting = price.isZero() && shares.isZero() && item !== null
 
-  if(delisting) {
-    store.remove("ListItem", id)
-  } else {
-    const item = new ListItem(id)
-    item.seller = owner
-    item.fraktal = token
-    item.gains = BigInt.fromI32(0)
-    item.price = price
-    item.shares = shares
-    item.save()
+  // if(delisting) {
+  //   store.remove("ListItem", id)
+  // } else {
+  if(item == null) {
+    item = new ListItem(id)
+    // item.gains = BigInt.fromI32(0)
   }
+  item.seller = owner.id
+  item.fraktal = fraktal.id
+  item.price = price
+  item.shares = shares
+  item.save()
 
-  const nft = FraktalNft.load(token)
-
-  if (nft) {
-    nft.status = delisting ? "closed" : "open"
-    nft.save()
-  }
+  // nft.status = delisting ? "closed" : "open"
+  fraktal.status = "open"
+  fraktal.save()
 }
 
 // // event Bought(address buyer,address seller, address tokenAddress, uint16 numberOfShares);
 export function handleBought(event: Bought): void {
-  log.debug('Bought {} {} {} {}',[event.params.buyer.toHexString(), event.params.seller.toHexString(), event.params.tokenAddress.toHexString(), event.params.numberOfShares.toString()]);
+  log.debug('Bought {} {} {} {}',[
+    event.params.buyer.toHexString(), 
+    event.params.seller.toHexString(), 
+    event.params.tokenAddress.toHexString(), 
+    event.params.numberOfShares.toString()
+  ]);
   let contract = FraktalMarket.bind(event.address);
   let sellerBalanceCall = contract.getSellerBalance(event.params.seller);
   let buyer = getUser(event.params.buyer.toHexString());
   buyer.save();
 
-  let fraktalAddress = event.params.tokenAddress;
-  let listedItemString =
-    event.params.seller.toHexString() + "-" + fraktalAddress.toHexString();
-  let listedItem = ListItem.load(listedItemString)!;
+  let fraktal = getFraktal(event.params.tokenAddress.toHexString())
+  let seller = getUser(event.params.seller.toHexString())
+
+  let listedItemId = seller.id + "-" + fraktal.id
+  let listedItem = ListItem.load(listedItemId)
+  if (listedItem == null) {
+    listedItem = new ListItem(listedItemId)
+    listedItem.seller = seller.id
+    listedItem.fraktal = event.params.tokenAddress.toHexString()
+  }
   listedItem.shares = listedItem.shares.minus(event.params.numberOfShares);
   listedItem.gains = listedItem.gains.plus(event.transaction.value);
   listedItem.save();
+  
 
   // let fraktalString = listedItem.fraktal;
-  let seller = getUser(event.params.seller.toHexString());
   // log.warning('seller before after {} {} {} ',[seller.balance.toString(),sellerBalanceCall.toString(),BigInt.fromI32(1337).toString()])
   seller.balance = sellerBalanceCall;
   seller.save();
@@ -85,22 +95,22 @@ export function handleOfferMade(event: OfferMade): void {
   let offererString = event.params.offerer.toHexString();
   let user = getUser(offererString);
   user.save();
-  let fraktalString = event.params.tokenAddress.toHexString();
-  let offerString = offererString + "-" + fraktalString;
-  let offer = Offer.load(offerString);
-  if (!offer) {
-    offer = new Offer(offerString);
+  let fraktal = getFraktal(event.params.tokenAddress.toHexString());
+  let offerId = offererString + "-" + fraktal.id;
+  let offer = Offer.load(offerId);
+  if (offer == null) {
+    offer = new Offer(offerId);
   }
   offer.offerer = offererString;
-  offer.fraktal = fraktalString;
+  offer.fraktal = fraktal.id;
   offer.value = event.params.value;
   offer.votes = BigInt.fromI32(0);
-  offer.timestamp = event.block.timestamp;
   offer.winner = false;
+  offer.timestamp = event.block.timestamp;
   offer.save();
-  let fraktal = FraktalNft.load(fraktalString)!;
+
   let totalOffers = fraktal.offers;
-  totalOffers.push(offerString);
+  totalOffers.push(offerId);
   fraktal.offers = totalOffers;
   fraktal.save();
 }
@@ -114,17 +124,17 @@ export function handleSellerPaymentPull(event: SellerPaymentPull): void {
 
 // event FraktalClaimed(address owner, address tokenAddress);
 export function handleFraktalClaimed(event: FraktalClaimed): void {
-  let fraktalAddress = event.params.tokenAddress;
-  let ownerString = event.params.owner.toHexString();
-  let fraktal = FraktalNft.load(fraktalAddress.toHexString())!;
-  let offerString = ownerString + "-" + fraktal.id;
-  let offer = Offer.load(offerString)!;
+  let owner = getUser(event.params.owner.toHexString())
+  let fraktal = getFraktal(event.params.tokenAddress.toHexString());
+  let offerId = owner.id + "-" + fraktal.id;
+
+  let offer = Offer.load(offerId)!;
   if (offer) {
     offer.value = BigInt.fromI32(0);
     offer.save();
   }
   fraktal.status = "Retrieved";
-  fraktal.owner = ownerString;
+  fraktal.owner = owner.id;
   // overwrite fraktionbalances of everyone to 0? just an idea!
   fraktal.save();
 }
@@ -132,17 +142,20 @@ export function handleFraktalClaimed(event: FraktalClaimed): void {
 // // OfferVoted(address voter, address offerer, address tokenAddress, bool sold)
 export function handleOfferVoted(event: OfferVoted): void {
   if (event.params.sold == true) {
-    let fraktal = FraktalNft.load(event.params.tokenAddress.toHexString())!;
+    let fraktal = getFraktal(event.params.tokenAddress.toHexString())
     // fraktal.buyer = event.params.offerer.toHexString();
     fraktal.status = "sold";
     fraktal.save();
-    let offerString =
+    
+    let offerId =
       event.params.offerer.toHexString() +
       "-" +
       event.params.tokenAddress.toHexString();
-    let offer = Offer.load(offerString)!;
-    offer.winner = true;
-    offer.save();
+    let offer = Offer.load(offerId);
+    if(offer) {
+      offer.winner = true;
+      offer.save();
+    }
   }
   // offer.votes = balance...
 }
@@ -153,46 +166,46 @@ export function handleAdminWithdrawFees(event: AdminWithdrawFees): void {
 
 export function handleAuctionContribute(event: AuctionContribute): void {
   let participant = event.params.participant.toHexString();
-  // let tokenAddress = event.params.tokenAddress;
   let seller = event.params.seller.toHexString();
   let sellerNonce = event.params.sellerNonce.toString();
   // let participantContribution = event.params.value;
 
-  let entity = Auction.load(`${seller}-${sellerNonce}`);
-  if(entity == null){
-    entity = new Auction(`${seller}-${sellerNonce}`);
-  }
+  getFraktal(event.params.tokenAddress.toHexString())
 
-  let _participants = entity.participants;
-  if(_participants)
+  let auction = Auction.load(`${seller}-${sellerNonce}`);
+  if(auction == null){
+    auction = new Auction(`${seller}-${sellerNonce}`);
+  }
+  
+  let _participants = auction.participants;
   _participants.push(participant);
-
-  if(entity){
-    entity.participants = _participants;
-    entity.save();
-  }
+  auction.participants = _participants;
+  
+  auction.seller = seller
+  auction.sellerNonce = event.params.sellerNonce
+  auction.save()
 }
 
 export function handleAuctionItemListed(event: AuctionItemListed): void {
   let nonceString = event.params.nonce.toString();
-  let sellerString = event.params.owner.toHexString();
-  let id = [sellerString, nonceString].join("-")
-  let entity = Auction.load(id);
+  let owner = getUser(event.params.owner.toHexString())
+  let id = owner.id + "-" + nonceString
+  
+  let fraktalId = event.params.tokenAddress.toHexString()
+  let fraktal = getFraktal(fraktalId)
 
-  if(entity == null){
-    entity = new Auction(id);
-    entity.auctionReserve = BigInt.fromI32(0);
-    entity.participants = [];
+  let auction = Auction.load(id);
+  if(auction == null) {
+    auction = new Auction(id);
   }
 
-  entity.seller = event.params.owner.toHexString();
-  entity.fraktal = event.params.tokenAddress.toHexString();
-  entity.price = event.params.reservePrice;
-  entity.shares = event.params.amountOfShares;
-  entity.end = event.params.endTime;
-  entity.sellerNonce = event.params.nonce;
-
-  entity.save();
+  auction.seller = owner.id
+  auction.fraktal = fraktal.id
+  auction.price = event.params.reservePrice;
+  auction.shares = event.params.amountOfShares;
+  auction.end = event.params.endTime;
+  auction.sellerNonce = event.params.nonce;
+  auction.save();
 }
 
 
