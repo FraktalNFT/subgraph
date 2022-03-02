@@ -2,7 +2,7 @@ type FraktalNft @entity {
   id: ID!
   marketId: BigInt!
   hash: String!
-  creator: User!
+  creator: User
   owner: User!
   createdAt: BigInt!
   fraktions: [FraktionsBalance!]! @derivedFrom(field: "nft")
