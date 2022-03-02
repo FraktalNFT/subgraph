@@ -18,7 +18,6 @@ export class FraktalNft extends Entity {
 
     this.set("marketId", Value.fromBigInt(BigInt.zero()));
     this.set("hash", Value.fromString(""));
-    this.set("creator", Value.fromString(""));
     this.set("owner", Value.fromString(""));
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("transactionHash", Value.fromString(""));
@@ -71,13 +70,21 @@ export class FraktalNft extends Entity {
     this.set("hash", Value.fromString(value));
   }
 
-  get creator(): string {
+  get creator(): string | null {
     let value = this.get("creator");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set creator(value: string) {
-    this.set("creator", Value.fromString(value));
+  set creator(value: string | null) {
+    if (!value) {
+      this.unset("creator");
+    } else {
+      this.set("creator", Value.fromString(<string>value));
+    }
   }
 
   get owner(): string {
