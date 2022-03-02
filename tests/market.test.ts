@@ -45,6 +45,7 @@ test("Can handle ItemListed event", () => {
   const newItemListedEvent = createItemListedEvent(owner, token, price, shares)
   handleItemListed(newItemListedEvent)
 
+  assert.fieldEquals("ListItem", id, "id", id)
   assert.fieldEquals("ListItem", id, "fraktal", token)
   assert.fieldEquals("ListItem", id, "seller", owner)
   assert.fieldEquals("ListItem", id, "gains", BigInt.zero().toString())
