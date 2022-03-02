@@ -92,6 +92,12 @@
         "internalType": "uint256",
         "name": "nonce",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
       }
     ],
     "name": "AuctionItemListed",
@@ -192,6 +198,12 @@
         "internalType": "uint256",
         "name": "amountOfShares",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
       }
     ],
     "name": "ItemListed",

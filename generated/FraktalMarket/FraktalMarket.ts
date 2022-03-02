@@ -98,6 +98,10 @@ export class AuctionItemListed__Params {
   get nonce(): BigInt {
     return this._event.parameters[5].value.toBigInt();
   }
+
+  get name(): string {
+    return this._event.parameters[6].value.toString();
+  }
 }
 
 export class Bought extends ethereum.Event {
@@ -211,6 +215,10 @@ export class ItemListed__Params {
 
   get amountOfShares(): BigInt {
     return this._event.parameters[3].value.toBigInt();
+  }
+
+  get name(): string {
+    return this._event.parameters[4].value.toString();
   }
 }
 

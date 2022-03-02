@@ -456,6 +456,7 @@ export class ListItem extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("name", Value.fromString(""));
     this.set("seller", Value.fromString(""));
     this.set("fraktal", Value.fromString(""));
     this.set("gains", Value.fromBigInt(BigInt.zero()));
@@ -487,6 +488,15 @@ export class ListItem extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get name(): string {
+    let value = this.get("name");
+    return value!.toString();
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
   }
 
   get seller(): string {
@@ -713,6 +723,15 @@ export class User extends Entity {
     this.set("listedItems", Value.fromStringArray(value));
   }
 
+  get auctionItems(): Array<string> {
+    let value = this.get("auctionItems");
+    return value!.toStringArray();
+  }
+
+  set auctionItems(value: Array<string>) {
+    this.set("auctionItems", Value.fromStringArray(value));
+  }
+
   get offersMade(): Array<string> {
     let value = this.get("offersMade");
     return value!.toStringArray();
@@ -737,6 +756,7 @@ export class Auction extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("name", Value.fromString(""));
     this.set("seller", Value.fromString(""));
     this.set("tokenAddress", Value.fromString(""));
     this.set("reservePrice", Value.fromBigInt(BigInt.zero()));
@@ -745,6 +765,7 @@ export class Auction extends Entity {
     this.set("sellerNonce", Value.fromBigInt(BigInt.zero()));
     this.set("auctionReserve", Value.fromBigInt(BigInt.zero()));
     this.set("participants", Value.fromStringArray(new Array(0)));
+    this.set("fraktal", Value.fromString(""));
   }
 
   save(): void {
@@ -771,6 +792,15 @@ export class Auction extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get name(): string {
+    let value = this.get("name");
+    return value!.toString();
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
   }
 
   get seller(): string {
@@ -843,5 +873,14 @@ export class Auction extends Entity {
 
   set participants(value: Array<string>) {
     this.set("participants", Value.fromStringArray(value));
+  }
+
+  get fraktal(): string {
+    let value = this.get("fraktal");
+    return value!.toString();
+  }
+
+  set fraktal(value: string) {
+    this.set("fraktal", Value.fromString(value));
   }
 }

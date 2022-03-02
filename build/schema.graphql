@@ -41,9 +41,9 @@ type Revenue @entity {
   buyout: Boolean!
 }
 
-
 type ListItem @entity {
   id: ID!
+  name: String!
   seller: User!
   fraktal: FraktalNft!
   gains: BigInt!
@@ -66,13 +66,15 @@ type User @entity {
   fraktals: [FraktalNft!]! @derivedFrom(field: "owner")
   fraktions: [FraktionsBalance!] @derivedFrom(field: "owner")
   listedItems: [ListItem!]! @derivedFrom(field: "seller")
+  auctionItems: [Auction!]! @derivedFrom(field: "seller")
   offersMade: [Offer!]! @derivedFrom(field: "offerer")
   revenues: [Revenue!]! @derivedFrom(field: "creator")
 }
 
 type Auction @entity {
   id: ID!
-  seller: String!
+  name: String!
+  seller: User!
   tokenAddress: String!
   reservePrice: BigInt!
   amountOfShare: BigInt!
@@ -80,4 +82,26 @@ type Auction @entity {
   sellerNonce: BigInt!
   auctionReserve: BigInt!
   participants: [String!]!
+  fraktal: FraktalNft!
 }
+
+type _Schema_
+  @fulltext(
+    name: "fraktalSearch"
+    language: simple
+    algorithm: rank
+    include: [
+    { entity: "ListItem", fields: [{ name: "name" }] }]
+  )
+  @fulltext(
+    name: "userSearch"
+    language: simple
+    algorithm: rank
+    include: [{ entity: "User", fields: [{ name: "id" }] }]
+  )
+  @fulltext(
+    name: "auctionSearch"
+    language: simple
+    algorithm: rank
+    include: [{ entity: "Auction", fields: [{ name: "name" }] }]
+  )

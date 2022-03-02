@@ -22,6 +22,7 @@ export function handleMinted(event: Minted): void {
   market.save()
   let fraktalString = event.params.tokenAddress.toHexString()
   let fraktalNft = new FraktalNft(fraktalString)
+ // fraktalNft.name = event.params.name
   fraktalNft.marketId = event.params.nftId
   fraktalNft.creator = senderString
   fraktalNft.owner = senderString

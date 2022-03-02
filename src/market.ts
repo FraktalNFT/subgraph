@@ -31,6 +31,7 @@ export function handleItemListed(event: ItemListed): void {
     listedItem.seller = senderString;
     listedItem.gains = BigInt.fromI32(0);
   }
+  listedItem.name = event.params.name;
   listedItem.price = event.params.price;
   listedItem.amount = event.params.amountOfShares;
   // listedItem.amount = event.params.amountOfShares.times(BigInt.fromString("1000000000000000000"));
@@ -168,19 +169,25 @@ export function handleAuctionItemListed(event: AuctionItemListed): void {
   let id = sellerString+'-'+nonceString;
   let entity = Auction.load(id);
 
+  let fraktalAddress = event.params.tokenAddress;
+  let fraktal = FraktalNft.load(fraktalAddress.toHexString())!;
+  fraktal.status = "open";
+  fraktal.save();
+
   if(entity == null){
     entity = new Auction(id);
     entity.auctionReserve = BigInt.fromI32(0);
     entity.participants = [];
   }
 
-
+  entity.name = event.params.name;
   entity.seller = event.params.owner.toHexString();
   entity.tokenAddress = event.params.tokenAddress.toHexString();
   entity.reservePrice = event.params.reservePrice;
   entity.amountOfShare = event.params.amountOfShares;
   entity.endTime = event.params.endTime;
   entity.sellerNonce = event.params.nonce;
+  entity.fraktal =  fraktalAddress.toHexString();
 
   entity.save();
 }
