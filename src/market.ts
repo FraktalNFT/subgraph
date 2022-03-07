@@ -92,21 +92,24 @@ export function handleBought(event: Bought): void {
 
 // // event OfferMade(address offerer, address tokenAddress, uint256 value);
 export function handleOfferMade(event: OfferMade): void {
-  let offererString = event.params.offerer.toHexString();
-  let user = getUser(offererString);
+  let user = getUser(event.params.offerer.toHexString());
   user.save();
   let fraktal = getFraktal(event.params.tokenAddress.toHexString());
-  let offerId = offererString + "-" + fraktal.id;
+  // TODO: this id has a collision when offerer sells and wants to buy back
+  let offerId = user.id + "-" + fraktal.id;
   let offer = Offer.load(offerId);
   if (offer == null) {
     offer = new Offer(offerId);
   }
-  offer.offerer = offererString;
+  offer.offerer = user.id;
   offer.fraktal = fraktal.id;
   offer.value = event.params.value;
-  offer.votes = BigInt.fromI32(0);
-  offer.winner = false;
-  offer.timestamp = event.block.timestamp;
+  // offer.votes = BigInt.fromI32(0);
+  // offer.winner = false;
+  offer.tx = event.transaction.hash
+  offer.block = event.block.number
+  offer.created = event.block.timestamp;
+  offer.updated = event.block.timestamp;
   offer.save();
 
   let totalOffers = fraktal.offers;
@@ -126,38 +129,32 @@ export function handleSellerPaymentPull(event: SellerPaymentPull): void {
 export function handleFraktalClaimed(event: FraktalClaimed): void {
   let owner = getUser(event.params.owner.toHexString())
   let fraktal = getFraktal(event.params.tokenAddress.toHexString());
-  let offerId = owner.id + "-" + fraktal.id;
-
-  let offer = Offer.load(offerId)!;
-  if (offer) {
-    offer.value = BigInt.fromI32(0);
-    offer.save();
-  }
   fraktal.status = "Retrieved";
   fraktal.owner = owner.id;
-  // overwrite fraktionbalances of everyone to 0? just an idea!
+  // TODO: overwrite fraktionbalances of everyone to 0? just an idea!
   fraktal.save();
 }
 
 // // OfferVoted(address voter, address offerer, address tokenAddress, bool sold)
 export function handleOfferVoted(event: OfferVoted): void {
-  if (event.params.sold == true) {
-    let fraktal = getFraktal(event.params.tokenAddress.toHexString())
-    // fraktal.buyer = event.params.offerer.toHexString();
-    fraktal.status = "sold";
-    fraktal.save();
-    
-    let offerId =
-      event.params.offerer.toHexString() +
-      "-" +
-      event.params.tokenAddress.toHexString();
-    let offer = Offer.load(offerId);
-    if(offer) {
-      offer.winner = true;
-      offer.save();
-    }
+  let fraktal = getFraktal(event.params.tokenAddress.toHexString())
+  let offerer = getUser(event.params.offerer.toHexString())
+  
+  fraktal.status = "sold";
+  fraktal.save();
+  
+  let offerId = offerer.id + "-" + fraktal.id
+  let offer = Offer.load(offerId)
+  if (offer == null) {
+    offer = new Offer(offerId)
+    offer.fraktal = fraktal.id
+    offer.offerer = offerer.id
   }
-  // offer.votes = balance...
+
+  offer.voter = event.params.voter.toHexString()
+  offer.winner = event.params.sold
+  offer.updated = event.block.timestamp
+  offer.save()
 }
 
 

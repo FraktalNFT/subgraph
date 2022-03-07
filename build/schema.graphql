@@ -27,9 +27,13 @@ type Offer @entity {
   fraktal: FraktalNft!
   offerer: User!
   value: BigInt!
+  voter: User
   votes: BigInt!
-  timestamp: BigInt!
   winner: Boolean!
+  tx: Bytes!
+  block: BigInt!
+  created: BigInt!
+  updated: BigInt!
 }
 
 type Revenue @entity {

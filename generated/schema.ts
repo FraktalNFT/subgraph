@@ -289,8 +289,11 @@ export class Offer extends Entity {
     this.set("offerer", Value.fromString(""));
     this.set("value", Value.fromBigInt(BigInt.zero()));
     this.set("votes", Value.fromBigInt(BigInt.zero()));
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("winner", Value.fromBoolean(false));
+    this.set("tx", Value.fromBytes(Bytes.empty()));
+    this.set("block", Value.fromBigInt(BigInt.zero()));
+    this.set("created", Value.fromBigInt(BigInt.zero()));
+    this.set("updated", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -346,6 +349,23 @@ export class Offer extends Entity {
     this.set("value", Value.fromBigInt(value));
   }
 
+  get voter(): string | null {
+    let value = this.get("voter");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set voter(value: string | null) {
+    if (!value) {
+      this.unset("voter");
+    } else {
+      this.set("voter", Value.fromString(<string>value));
+    }
+  }
+
   get votes(): BigInt {
     let value = this.get("votes");
     return value!.toBigInt();
@@ -355,15 +375,6 @@ export class Offer extends Entity {
     this.set("votes", Value.fromBigInt(value));
   }
 
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
-    return value!.toBigInt();
-  }
-
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
-  }
-
   get winner(): boolean {
     let value = this.get("winner");
     return value!.toBoolean();
@@ -371,6 +382,42 @@ export class Offer extends Entity {
 
   set winner(value: boolean) {
     this.set("winner", Value.fromBoolean(value));
+  }
+
+  get tx(): Bytes {
+    let value = this.get("tx");
+    return value!.toBytes();
+  }
+
+  set tx(value: Bytes) {
+    this.set("tx", Value.fromBytes(value));
+  }
+
+  get block(): BigInt {
+    let value = this.get("block");
+    return value!.toBigInt();
+  }
+
+  set block(value: BigInt) {
+    this.set("block", Value.fromBigInt(value));
+  }
+
+  get created(): BigInt {
+    let value = this.get("created");
+    return value!.toBigInt();
+  }
+
+  set created(value: BigInt) {
+    this.set("created", Value.fromBigInt(value));
+  }
+
+  get updated(): BigInt {
+    let value = this.get("updated");
+    return value!.toBigInt();
+  }
+
+  set updated(value: BigInt) {
+    this.set("updated", Value.fromBigInt(value));
   }
 }
 
