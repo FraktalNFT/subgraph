@@ -6,9 +6,9 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0x1421ba6B13955102F0EB92fcB819e97bc1D00578"
+      address: "0x327f200DC085366e681EF15b11c3042890A7fE1E"
       abi: FraktalMarket
-      startBlock: 10138586
+      startBlock: 10227899
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -35,7 +35,7 @@ dataSources:
       eventHandlers:
         - event: Bought(address,address,address,uint256)
           handler: handleBought
-        - event: ItemListed(address,address,uint256,uint256)
+        - event: ItemListed(address,address,uint256,uint256,string)
           handler: handleItemListed
         - event: FraktalClaimed(address,address)
           handler: handleFraktalClaimed
@@ -47,7 +47,7 @@ dataSources:
           handler: handleOfferVoted
         - event: AuctionContribute(address,address,address,uint256,uint256)
           handler: handleAuctionContribute
-        - event: AuctionItemListed(address,address,uint256,uint256,uint256,uint256)
+        - event: AuctionItemListed(address,address,uint256,uint256,uint256,uint256,string)
           handler: handleAuctionItemListed
         - event: FeeUpdated(uint16)
           handler: handleFeeUpdated
@@ -58,9 +58,9 @@ dataSources:
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0xec6cA84e13E013A3F8C2D62A9030a01234CB9bF3"
+      address: "0x7728f49B7D76b23FCeE7A3600Da9a303FB38384B"
       abi: FraktalFactory
-      startBlock: 10138586
+      startBlock: 10227899
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
