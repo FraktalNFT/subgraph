@@ -85,6 +85,12 @@ type Auction @entity {
   fraktal: FraktalNft!
 }
 
+
+type Staked @entity {
+  id: ID!
+  amount: BigInt!
+}
+
 type _Schema_
   @fulltext(
     name: "fraktalSearch"

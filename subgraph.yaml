@@ -9,14 +9,14 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0x327f200DC085366e681EF15b11c3042890A7fE1E"
+      address: "0x1379cf637fc4cf09D89CDc9131C38DD4dd15D1c7"
       #address: "0x09f1C46fa4b191204a3dc7FE60d5891BE056DaA4"
       # address: "0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4"  w/ auction
       #0xD71CB14bB50C39D090083C6c3be934AF2b435fEB current 
       # address: "0xE592641ddA55049dF27b6738D12cA977e68b3bB5" #Proxy
         # "0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851" > "0x2b063393585e5B9A507568D25b42280aE926aD13"
       abi: FraktalMarket
-      startBlock: 10227899
+      startBlock: 10297015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -78,14 +78,14 @@ dataSources:
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0x7728f49B7D76b23FCeE7A3600Da9a303FB38384B"
+      address: "0x9c27b4310F128Fdb6cfE6b2eA32Af3774Bf6778e"
       #address: "0x63482606676D6Ae60C893b7bc61cAA1a736DA472"
       # address: "0xd8646eA0064538EC100881893d98537f611C53bC" new with decimals
       # address: "0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e" oldv2
       # address: "0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE" old
       # refer https://github.com/FraktalNFT/dapp-frontend/blob/main/utils/constants.ts
       abi: FraktalFactory
-      startBlock: 10227899
+      startBlock: 10297015
       # startBlock: 9414170
     mapping:
       kind: ethereum/events
@@ -125,6 +125,30 @@ dataSources:
         # - event: FraktalProtocolUpgraded(address)
         #   handler: handleFraktalProtocolUpgraded
       file: ./src/factory.ts
+  - kind: ethereum/contract
+    name: FeeSharingSystem
+    network: rinkeby
+    source:
+      address: "0xe398a2Cfa41440e7d33bbdC76f0a65C9Ca3D8373"
+      abi: FeeSharingSystem
+      startBlock: 10297015
+      # startBlock: 9414170
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+      abis:
+        - name: FeeSharingSystem
+          file: ./abis/FeeSharingSystem.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdraw
+      file: ./src/feeSharing.ts
 
 templates:
   - kind: ethereum/contract

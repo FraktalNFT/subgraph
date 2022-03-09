@@ -6,9 +6,9 @@ dataSources:
     name: FraktalMarket
     network: rinkeby
     source:
-      address: "0x327f200DC085366e681EF15b11c3042890A7fE1E"
+      address: "0x1379cf637fc4cf09D89CDc9131C38DD4dd15D1c7"
       abi: FraktalMarket
-      startBlock: 10227899
+      startBlock: 10297015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -58,9 +58,9 @@ dataSources:
     name: FraktalFactory
     network: rinkeby
     source:
-      address: "0x7728f49B7D76b23FCeE7A3600Da9a303FB38384B"
+      address: "0x9c27b4310F128Fdb6cfE6b2eA32Af3774Bf6778e"
       abi: FraktalFactory
-      startBlock: 10227899
+      startBlock: 10297015
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -88,6 +88,29 @@ dataSources:
         - event: ERC1155UnLocked(address,address,address,uint256)
           handler: handleERC1155UnLocked
       file: FraktalFactory/FraktalFactory.wasm
+  - kind: ethereum/contract
+    name: FeeSharingSystem
+    network: rinkeby
+    source:
+      address: "0xe398a2Cfa41440e7d33bbdC76f0a65C9Ca3D8373"
+      abi: FeeSharingSystem
+      startBlock: 10297015
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+      abis:
+        - name: FeeSharingSystem
+          file: FeeSharingSystem/abis/FeeSharingSystem.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdraw
+      file: FeeSharingSystem/FeeSharingSystem.wasm
 templates:
   - kind: ethereum/contract
     name: FraktalNFT
