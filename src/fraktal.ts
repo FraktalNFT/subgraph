@@ -107,7 +107,7 @@ export function handleDefraktionalized(event: Defraktionalized): void {
 
 // TransferSingle(address operator, address from, address to, uint256 id, uint256 value)
 export function handleTransferSingle(event: TransferSingle): void {
-  log.warning('Transfer single from {} -> {} {} value : {}',[event.params.from.toHexString(), event.params.to.toHexString(), event.params.id.toHexString(), event.params.value.toString()]);
+  // log.warning('Transfer single from {} -> {} {} value : {}',[event.params.from.toHexString(), event.params.to.toHexString(), event.params.id.toHexString(), event.params.value.toString()]);
   // check the sub id, if 0, change the owner of fraktals
   let owner = getUser(event.params.to.toHexString());
   let fraktal = FraktalNft.load(event.address.toHexString())!;
@@ -132,7 +132,7 @@ export function handleTransferSingle(event: TransferSingle): void {
     spenderFraktions.amount = spenderFraktions.amount.minus(event.params.value);
     ownerFraktions.amount = ownerFraktions.amount.plus(event.params.value);
 
-    log.warning('Fraktions -> from:{}, to:{}',[spenderFraktions.amount.toString(),ownerFraktions.amount.toString()])
+    // log.warning('Fraktions -> from:{}, to:{}',[spenderFraktions.amount.toString(),ownerFraktions.amount.toString()])
 
     spenderFraktions.save();
     ownerFraktions.save();
