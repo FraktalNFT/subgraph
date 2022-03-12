@@ -40,10 +40,14 @@ export function handleMinted(event: Minted): void {
 export function handleERC721Locked(event: ERC721Locked): void {
   let user = getUser(event.params.locker.toHexString());
   user.save()
-  let importedERC721 = new NFTCollateral(event.params.tokenAddress.toHexString());
+  let id = `${event.params.tokenAddress.toHexString()}-${event.params.tokenId.toString()}`
+  let importedERC721 = new NFTCollateral(id);
+  let fraktal = FraktalNft.load(event.params.fraktal.toHexString())!;
   // fraktal.collateral = importedERC721.id;
   // fraktal.save();
-  let fraktal = FraktalNft.load(event.params.fraktal.toHexString())!;
+  if("0xe8d70d37d812906305b9505920fe43998078ca6c" == importedERC721.id.toString()){
+    log.warning("721LOCKED: fraktalid: {}, erc721id{}",[fraktal.id.toString(),importedERC721.id.toString()]);
+  }
   importedERC721.fraktal = fraktal.id;
   importedERC721.tokenId = event.params.tokenId;
   importedERC721.type = 'ERC721';
@@ -53,10 +57,12 @@ export function handleERC721Locked(event: ERC721Locked): void {
 export function handleERC1155Locked(event: ERC1155Locked): void {
   let user = getUser(event.params.locker.toHexString());
   user.save()
-  let importedERC1155 = new NFTCollateral(event.params.tokenAddress.toHexString());
+  let id = `${event.params.tokenAddress.toHexString()}-${event.params.tokenId.toString()}`
+  let importedERC1155 = new NFTCollateral(id);
+  let fraktal = FraktalNft.load(event.params.fraktal.toHexString())!;
   // fraktal.collateral = importedERC1155.id;
   // fraktal.save();
-  let fraktal = FraktalNft.load(event.params.fraktal.toHexString())!;
+  // log.warning("1155LOCKED: fraktalid: {}, erc1155id{}",[fraktal.id.toString(),importedERC1155.id.toString()]);
   importedERC1155.fraktal = fraktal.id;
   importedERC1155.tokenId = event.params.tokenId;
   importedERC1155.type = 'ERC1155';
@@ -64,7 +70,8 @@ export function handleERC1155Locked(event: ERC1155Locked): void {
 }
 // event ERC721UnLocked(address owner, uint256 tokenId, address collateralNft, uint256 index);
 export function handleERC721UnLocked(event: ERC721UnLocked): void {
-  let importedERC721 = NFTCollateral.load(event.params.collateralNft.toHexString());
+  let id = `${event.params.collateralNft.toHexString()}-${event.params.index.toString()}`
+  let importedERC721 = NFTCollateral.load(id);
   if(importedERC721){
   let fraktal = FraktalNft.load(importedERC721.fraktal!)!;
   fraktal.status = 'retrieved'
@@ -76,7 +83,8 @@ export function handleERC721UnLocked(event: ERC721UnLocked): void {
 }
 // event ERC1155UnLocked(address owner, address tokenAddress, address collateralNft, uint256 index);
 export function handleERC1155UnLocked(event: ERC1155UnLocked): void {
-  let importedERC1155 = NFTCollateral.load(event.params.collateralNft.toHexString())!;
+  let id = `${event.params.collateralNft.toHexString()}-${event.params.index.toString()}`
+  let importedERC1155 = NFTCollateral.load(id)!;
   let fraktal = FraktalNft.load(importedERC1155.fraktal!)!;
   fraktal.status = 'retrieved'
   fraktal.save()
