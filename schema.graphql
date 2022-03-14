@@ -91,6 +91,11 @@ type Staked @entity {
   amount: BigInt!
 }
 
+type EthVolume @entity {
+  id: ID!
+  ethVolume: BigInt!
+}
+
 type _Schema_
   @fulltext(
     name: "fraktalSearch"
