@@ -928,3 +928,47 @@ export class Staked extends Entity {
     this.set("amount", Value.fromBigInt(value));
   }
 }
+
+export class EthVolume extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("ethVolume", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save EthVolume entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save EthVolume entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("EthVolume", id.toString(), this);
+    }
+  }
+
+  static load(id: string): EthVolume | null {
+    return changetype<EthVolume | null>(store.get("EthVolume", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get ethVolume(): BigInt {
+    let value = this.get("ethVolume");
+    return value!.toBigInt();
+  }
+
+  set ethVolume(value: BigInt) {
+    this.set("ethVolume", Value.fromBigInt(value));
+  }
+}

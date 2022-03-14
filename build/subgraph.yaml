@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: FraktalMarket
-    network: rinkeby
+    network: mainnet
     source:
-      address: "0x1379cf637fc4cf09D89CDc9131C38DD4dd15D1c7"
+      address: "0x244763Ea2039D880B62D2BA427d8919Eba6ee50B"
       abi: FraktalMarket
-      startBlock: 10297015
+      startBlock: 14383929
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -56,11 +56,11 @@ dataSources:
       file: FraktalMarket/FraktalMarket.wasm
   - kind: ethereum/contract
     name: FraktalFactory
-    network: rinkeby
+    network: mainnet
     source:
-      address: "0x9c27b4310F128Fdb6cfE6b2eA32Af3774Bf6778e"
+      address: "0x5DF977d385254D9a66ab8cD35e87E1E0c419b135"
       abi: FraktalFactory
-      startBlock: 10297015
+      startBlock: 14383929
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -90,11 +90,11 @@ dataSources:
       file: FraktalFactory/FraktalFactory.wasm
   - kind: ethereum/contract
     name: FeeSharingSystem
-    network: rinkeby
+    network: mainnet
     source:
-      address: "0xe398a2Cfa41440e7d33bbdC76f0a65C9Ca3D8373"
+      address: "0xa74a87Da1E4c6f3a742D3e4DDe6750a957Ca3aC3"
       abi: FeeSharingSystem
-      startBlock: 10297015
+      startBlock: 14383929
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -114,7 +114,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: FraktalNFT
-    network: rinkeby
+    network: mainnet
     source:
       abi: FraktalNFT
     mapping:
@@ -151,7 +151,7 @@ templates:
           handler: handleTransferSingle
   - kind: ethereum/contract
     name: PaymentSplitterUpgradeable
-    network: rinkeby
+    network: mainnet
     source:
       abi: PaymentSplitterUpgradeable
     mapping:

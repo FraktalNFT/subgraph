@@ -12,8 +12,9 @@ import {
   AuctionItemListed,
   AuctionContribute,
   AdminWithdrawFees,
+  Volume
 } from "../generated/FraktalMarket/FraktalMarket";
-import { FraktalNft, Offer, ListItem, Auction } from "../generated/schema";
+import { FraktalNft, Offer, ListItem, Auction, EthVolume } from "../generated/schema";
 import { getUser, getFraktionBalance } from "./helpers";
 
 // // event ItemListed(address owner, address tokenAddress, uint256 price, uint256 amountOfShares);
@@ -192,10 +193,27 @@ export function handleAuctionItemListed(event: AuctionItemListed): void {
   entity.save();
 }
 
+export function handleVolume(event: Volume): void {
+  let user = event.params.user.toHexString();
+  let volume = event.params.volume;
+
+  let entity = EthVolume.load(user);
+  if(entity == null){
+    entity = new EthVolume(user);
+    entity.ethVolume = BigInt.fromI32(0);
+  }
+
+  entity.ethVolume = entity.ethVolume.plus(volume);
+
+  entity.save();
+}
+
 
 export function handleFeeUpdated(event: FeeUpdated): void {}
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+
+
 
 
 // // event FeeUpdated(uint16 newFee);
